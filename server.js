@@ -4,10 +4,14 @@ const cors = require('cors');
 const helmet = require('helmet');
 const morgan = require('morgan');
 const rateLimit = require('express-rate-limit');
+const path = require('path');
 const logger = require('./config/logger');
 const { startCrons } = require('./cron/index');
 
 const app = express();
+
+// ── Serve frontend ──
+app.use(express.static(path.join(__dirname, 'public')));
 
 // ── Security & middleware ──
 app.use(helmet());
@@ -129,9 +133,12 @@ app.get('/health', async (req, res) => {
   });
 });
 
-// ── 404 ──
-app.use((req, res) => {
-  res.status(404).json({ error: `Route not found: ${req.method} ${req.path}` });
+// ── Catch-all: serve frontend for non-API routes ──
+app.use((req, res, next) => {
+  if (req.path.startsWith('/api/') || req.path.startsWith('/webhooks/') || req.path === '/health') {
+    return res.status(404).json({ error: `Route not found: ${req.method} ${req.path}` });
+  }
+  res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
 // ── Global error handler ──

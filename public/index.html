@@ -1,0 +1,1806 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover"/>
+<title>K·Network — IIMK</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:opsz,wght@9..40,400;500;600;700&display=swap" rel="stylesheet"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-font-smoothing:antialiased;-webkit-tap-highlight-color:transparent}
+:root{
+  --or:#FF5C35;--pu:#5B3CF5;--gr:#00BF6F;--am:#F59E0B;--pi:#E040FB;
+  --g1:linear-gradient(135deg,#FF5C35,#5B3CF5);
+  --g2:linear-gradient(135deg,#5B3CF5,#E040FB);
+  --g3:linear-gradient(135deg,#00BF6F,#0EA5E9);
+  --g4:linear-gradient(135deg,#F59E0B,#EF4444);
+  --ink:#0A0612;--sub:#4B3F72;--mute:#9B8FC0;--dim:#D4CCED;
+  --bg:#F2F0FA;--card:#FFF;--border:rgba(91,60,245,.09);
+  --tab:74px;--nav:58px;--safe:env(safe-area-inset-bottom,0px)
+}
+html,body{height:100%;background:var(--bg);font-family:"DM Sans",system-ui,sans-serif;overflow:hidden}
+#app{position:fixed;inset:0;display:flex;flex-direction:column;max-width:430px;margin:0 auto;background:var(--bg)}
+
+/* SCREENS */
+.screens{flex:1;position:relative;overflow:hidden}
+.scr{position:absolute;inset:0;display:flex;flex-direction:column;opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;transform:translateX(16px)}
+.scr.on{opacity:1;pointer-events:all;transform:none}
+.sa{flex:1;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;scrollbar-width:none;overscroll-behavior:contain}
+.sa::-webkit-scrollbar{display:none}
+
+/* TOP BAR */
+.bar{height:var(--nav);padding:0 18px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;background:var(--bg);gap:12px}
+.bar-gem{width:34px;height:34px;border-radius:11px;background:var(--g1);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.bar-gem svg{width:17px;height:17px;fill:#fff}
+.wordmark{font-family:"Syne",sans-serif;font-size:20px;color:var(--ink);letter-spacing:-.3px}
+.bar-t{font-family:"Syne",sans-serif;font-size:18px;color:var(--ink);letter-spacing:-.2px;flex:1}
+.bar-r{display:flex;gap:8px;align-items:center}
+.ib{width:38px;height:38px;border-radius:13px;background:var(--card);border:1.5px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;position:relative;flex-shrink:0}
+.ib svg{width:17px;height:17px;stroke:var(--sub);fill:none;stroke-width:2}
+.rdot{position:absolute;top:8px;right:8px;width:7px;height:7px;background:#FF3B30;border-radius:50%;border:1.5px solid var(--bg)}
+
+/* TAB BAR */
+.tabbar{height:calc(var(--tab) + var(--safe));padding-bottom:var(--safe);background:rgba(255,255,255,.96);backdrop-filter:blur(24px);border-top:1px solid var(--border);display:flex;flex-shrink:0;z-index:50}
+.tab{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;cursor:pointer;padding-top:8px;position:relative;transition:transform .12s}
+.tab:active{transform:scale(.88)}
+.tab-ic{width:28px;height:28px;display:flex;align-items:center;justify-content:center;border-radius:9px;transition:all .18s}
+.tab-ic svg{width:22px;height:22px;stroke:var(--dim);fill:none;stroke-width:1.9;transition:all .18s}
+.tab.on .tab-ic{background:linear-gradient(135deg,rgba(255,92,53,.14),rgba(91,60,245,.14))}
+.tab.on .tab-ic svg{stroke:var(--pu)}
+.tab-l{font-size:10px;font-weight:700;color:var(--dim);letter-spacing:.01em;transition:color .18s}
+.tab.on .tab-l{color:var(--pu)}
+.tbadge{position:absolute;top:4px;right:calc(50% - 22px);background:#FF3B30;color:#fff;font-size:9px;font-weight:800;padding:1px 5px;border-radius:20px;border:2px solid var(--bg);min-width:16px;text-align:center}
+
+/* FAB */
+.fab{position:fixed;right:18px;bottom:calc(var(--tab) + var(--safe) + 14px);width:54px;height:54px;border-radius:50%;background:var(--g1);display:flex;align-items:center;justify-content:center;box-shadow:0 6px 22px rgba(91,60,245,.38);cursor:pointer;z-index:60;border:none;transition:transform .14s,opacity .2s}
+.fab:active{transform:scale(.9)}
+.fab.hide{opacity:0;pointer-events:none}
+.fab svg{width:22px;height:22px;stroke:#fff;fill:none;stroke-width:2.5}
+
+/* PRIMITIVES */
+.tag{display:inline-flex;align-items:center;font-size:11px;font-weight:700;padding:3px 9px;border-radius:30px;white-space:nowrap;flex-shrink:0}
+.tor{background:#FFF0EB;color:#C2410C}.tpu{background:#EDEDFF;color:#3730A3}.tgr{background:#ECFDF5;color:#065F46}.tbl{background:#EFF6FF;color:#1D4ED8}.tpi{background:#FDF2F8;color:#9D174D}.tam{background:#FFFBEB;color:#78350F}.tgry{background:#F3F4F6;color:#374151}
+.av{display:flex;align-items:center;justify-content:center;border-radius:50%;font-weight:800;flex-shrink:0;font-family:"Syne",sans-serif}
+.aor{background:#FFF0EB;color:#C2410C}.apu{background:#EDEDFF;color:#3730A3}.ate{background:#ECFDF5;color:#065F46}.aam{background:#FFFBEB;color:#78350F}.api{background:#FDF2F8;color:#9D174D}.agrd{background:var(--g1);color:#fff}.agr2{background:var(--g2);color:#fff}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:5px;padding:10px 16px;border-radius:13px;font-size:13px;font-weight:700;cursor:pointer;border:none;font-family:"DM Sans",sans-serif;transition:all .14s;white-space:nowrap}
+.btn:active{transform:scale(.95)}
+.bg{background:var(--g1);color:#fff;box-shadow:0 3px 14px rgba(91,60,245,.28)}
+.bg2{background:var(--g2);color:#fff;box-shadow:0 3px 14px rgba(91,60,245,.28)}
+.bg3{background:var(--g3);color:#fff}
+.bo{background:transparent;border:1.5px solid var(--border);color:var(--sub)}
+.bghost{background:transparent;color:var(--mute);font-size:12px}
+.bsm{padding:8px 13px;font-size:12px;border-radius:11px}
+.bxs{padding:5px 11px;font-size:11px;border-radius:9px}
+.bfull{width:100%;border-radius:16px;padding:14px;font-size:14px}
+.sec{font-family:"Syne",sans-serif;font-size:14px;color:var(--ink);margin-bottom:12px;letter-spacing:-.1px}
+
+/* CHIP SCROLL */
+.chips{display:flex;gap:8px;overflow-x:auto;padding:0 18px 14px;scrollbar-width:none;flex-shrink:0}
+.chips::-webkit-scrollbar{display:none}
+.chip{padding:7px 15px;border-radius:30px;border:1.5px solid var(--border);font-size:12px;font-weight:700;cursor:pointer;color:var(--mute);background:var(--card);white-space:nowrap;flex-shrink:0;font-family:"DM Sans",sans-serif;transition:all .14s}
+.chip.on{background:var(--g1);color:#fff;border-color:transparent;box-shadow:0 3px 10px rgba(91,60,245,.28)}
+/* SEARCH */
+.sbar{margin:0 18px 13px;position:relative}
+.sinp{width:100%;padding:12px 15px 12px 44px;border-radius:16px;border:1.5px solid var(--border);background:var(--card);font-size:14px;color:var(--ink);font-family:"DM Sans",sans-serif;outline:none}
+.sinp:focus{border-color:rgba(91,60,245,.4)}
+.sinp::placeholder{color:var(--dim)}
+.sico{position:absolute;left:14px;top:50%;transform:translateY(-50%);stroke:var(--mute);fill:none;stroke-width:2;width:17px;height:17px}
+
+/* CARDS */
+.card{background:var(--card);border:1.5px solid var(--border);border-radius:22px;padding:16px;margin:0 18px 10px;transition:transform .1s}
+.card:active{transform:scale(.985)}
+.cardf{background:var(--card);border:1.5px solid var(--border);border-radius:22px;overflow:hidden;margin:0 18px 10px}
+
+/* PROGRESS */
+.prog-wrap{margin-top:10px}
+.prog-lbl{display:flex;justify-content:space-between;font-size:12px;margin-bottom:7px}
+.prog-n{font-weight:700;color:var(--ink)}.prog-p{color:var(--mute)}
+.prog-track{height:8px;background:#EDE9FF;border-radius:30px;overflow:hidden}
+.prog-fill{height:100%;border-radius:30px;transition:width 1.3s cubic-bezier(.4,0,.2,1)}
+
+/* AVATAR STACK */
+.av-stack{display:flex}
+.av-stack .av{border:2px solid var(--card);margin-right:-9px}
+
+/* SHEET */
+.sov{position:absolute;inset:0;background:rgba(10,6,18,.54);z-index:80;display:none;backdrop-filter:blur(8px)}
+.sov.on{display:block}
+.sh{position:absolute;bottom:0;left:0;right:0;background:var(--card);border-radius:28px 28px 0 0;z-index:81;transform:translateY(100%);transition:transform .3s cubic-bezier(.4,0,.2,1);max-height:90%;display:flex;flex-direction:column}
+.sh.on{transform:none}
+.sh-hnd{width:38px;height:4px;background:var(--dim);border-radius:2px;margin:13px auto 0}
+.sh-hd{padding:15px 20px 13px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border)}
+.sh-t{font-family:"Syne",sans-serif;font-size:19px;color:var(--ink)}
+.sh-b{overflow-y:auto;flex:1;scrollbar-width:none}
+.sh-b::-webkit-scrollbar{display:none}
+
+/* TOGGLE */
+.tog{position:relative;width:40px;height:24px;flex-shrink:0}
+.tog input{opacity:0;width:0;height:0;position:absolute}
+.tog-sl{position:absolute;inset:0;background:#D1D5DB;border-radius:30px;cursor:pointer;transition:background .2s}
+.tog-sl::before{content:"";position:absolute;width:18px;height:18px;border-radius:50%;background:#fff;left:3px;top:3px;transition:transform .2s;box-shadow:0 1px 4px rgba(0,0,0,.18)}
+.tog input:checked+.tog-sl{background:var(--or)}
+.tog input:checked+.tog-sl::before{transform:translateX(16px)}
+
+/* TOAST */
+.toast{position:fixed;bottom:calc(var(--tab) + var(--safe) + 14px);left:50%;transform:translateX(-50%) translateY(12px);background:rgba(10,6,18,.88);color:#fff;padding:11px 22px;border-radius:30px;font-size:13.5px;font-weight:600;z-index:200;opacity:0;transition:all .25s;pointer-events:none;white-space:nowrap;backdrop-filter:blur(12px);max-width:calc(100vw - 40px);text-align:center}
+.toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* ══════════════ FEED ══════════════ */
+.feed-post{background:var(--card);border:1.5px solid var(--border);border-radius:22px;margin:0 18px 12px;overflow:hidden}
+.fp-top{display:flex;align-items:center;gap:11px;padding:14px 14px 10px}
+.fp-author{flex:1}
+.fp-name{font-size:14px;font-weight:700;color:var(--ink)}
+.fp-role{font-size:11.5px;color:var(--mute);margin-top:1px}
+.fp-time{font-size:11px;color:var(--dim)}
+.fp-body{padding:0 14px 10px;font-size:13.5px;color:var(--sub);line-height:1.65}
+.fp-body strong{font-weight:700;color:var(--ink)}
+.fp-img{width:100%;height:140px;object-fit:cover;background:var(--g1);display:flex;align-items:center;justify-content:center;font-size:36px;margin-bottom:0}
+.fp-tag-row{padding:8px 14px;display:flex;gap:6px;flex-wrap:wrap}
+.fp-actions{display:flex;border-top:1px solid rgba(91,60,245,.07);padding:2px 0}
+.fp-act{flex:1;display:flex;align-items:center;justify-content:center;gap:5px;padding:10px;font-size:12px;font-weight:600;color:var(--mute);cursor:pointer;transition:color .15s}
+.fp-act:active{color:var(--pu)}
+.fp-act svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2}
+.fp-compose{margin:0 18px 14px;background:var(--card);border:1.5px solid var(--border);border-radius:20px;padding:13px 14px;display:flex;align-items:center;gap:11px;cursor:pointer}
+.fp-compose-av{width:36px;height:36px;background:var(--g1);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;color:#fff;font-family:"Syne",sans-serif;flex-shrink:0}
+.fp-compose-ph{font-size:13.5px;color:var(--dim);flex:1}
+.fp-compose-post{background:var(--g1);color:#fff;font-size:12px;font-weight:700;padding:7px 14px;border-radius:30px;border:none;font-family:"DM Sans",sans-serif;cursor:pointer}
+/* story bar */
+
+
+/* ══════════════ NETWORK HUB ══════════════ */
+.hub-tiles{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:0 18px 14px}
+.hub-tile{border-radius:18px;padding:16px 14px 14px;cursor:pointer;transition:transform .14s;display:flex;flex-direction:column;gap:0;border:1.5px solid transparent}
+.hub-tile:active{transform:scale(.96)}
+.hub-tile-icon{display:none}
+.hub-tile-left{display:none}
+.hub-tile-title{font-family:"Syne",sans-serif;font-size:14px;font-weight:800;margin-bottom:3px;line-height:1.2}
+.hub-tile-sub{font-size:11px;font-weight:500;margin-bottom:12px;line-height:1.4}
+.hub-tile-right{display:flex;align-items:center;justify-content:space-between}
+.hub-tile-count{font-size:11px;font-weight:800;padding:3px 10px;border-radius:20px}
+.hub-tile-arrow{font-size:16px;font-weight:700;opacity:.6}
+.hub-tile::after{display:none}
+
+/* ══════════════ ALUMNI ══════════════ */
+.al-card{padding:15px 18px;border-bottom:1px solid rgba(91,60,245,.06);display:flex;align-items:flex-start;gap:13px;cursor:pointer;background:var(--card);transition:background .1s}
+.al-card:active{background:rgba(91,60,245,.03)}
+.al-info{flex:1;min-width:0}
+.al-name{font-family:"Syne",sans-serif;font-size:15px;color:var(--ink)}
+.al-role{font-size:12.5px;color:var(--sub);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.al-loc{font-size:11.5px;color:var(--mute);margin-top:3px}
+.al-lk{font-size:11px;color:#059669;font-weight:700;margin-top:2px}
+.al-tags-row{display:flex;gap:5px;flex-wrap:wrap;margin-top:8px}
+.al-btns-row{display:flex;gap:7px;margin-top:10px;flex-wrap:wrap}
+.al-card-wrap{background:var(--card);border:1.5px solid var(--border);border-radius:0;overflow:hidden;margin:0 18px;border-radius:22px}
+
+/* ══════════════ K-MATCH ══════════════ */
+.kmdeck{padding:0 18px;position:relative;height:480px;margin-bottom:6px}
+.kmghost{position:absolute;background:var(--card);border:1.5px solid var(--border);border-radius:28px;transition:all .3s}
+.kmghost.g1{inset:18px 14px 0;opacity:.48;transform:scale(.955)}
+.kmghost.g2{inset:32px 26px 0;opacity:.24;transform:scale(.91)}
+.kmc{position:absolute;inset:0;background:var(--card);border:1.5px solid var(--border);border-radius:28px;overflow:hidden;box-shadow:0 10px 36px rgba(91,60,245,.12);display:flex;flex-direction:column;align-items:center;padding:22px 20px 18px;cursor:grab;user-select:none;-webkit-user-select:none;touch-action:pan-y}
+.kmc:active{cursor:grabbing}
+.kmc.snap{transition:transform .35s cubic-bezier(.4,0,.2,1),opacity .35s}
+.kmc.bl{transform:translateX(-115%) rotate(-22deg) !important;opacity:0}
+.kmc.br{transform:translateX(115%) rotate(22deg) !important;opacity:0}
+.swipe-label{position:absolute;top:28px;font-family:"Syne",sans-serif;font-size:22px;font-weight:800;padding:6px 18px;border-radius:12px;border:3px solid;opacity:0;pointer-events:none;transition:opacity .12s;z-index:10;letter-spacing:1px;transform:rotate(-12deg)}
+.swipe-label.connect{left:18px;color:#16A34A;border-color:#16A34A;background:rgba(22,163,74,.08);transform:rotate(-12deg)}
+.swipe-label.skip{right:18px;color:#DC2626;border-color:#DC2626;background:rgba(220,38,38,.08);transform:rotate(12deg)}
+.swipe-hint{display:flex;align-items:center;justify-content:center;gap:16px;margin-top:8px;font-size:11.5px;color:var(--muted);padding:0 20px}
+.swipe-hint span{display:flex;align-items:center;gap:4px}
+.km-li-btn{display:flex;align-items:center;justify-content:center;gap:7px;width:100%;padding:11px;border-radius:14px;background:#EBF3FB;border:1.5px solid #BFDBF0;color:#0A66C2;font-size:13px;font-weight:700;cursor:pointer;margin-top:10px;font-family:"DM Sans",sans-serif}
+.km-li-btn svg{width:16px;height:16px;fill:#0A66C2}
+.kmc-glow{position:absolute;inset:0;background:radial-gradient(circle at 70% 15%,rgba(255,92,53,.07),transparent 55%),radial-gradient(circle at 20% 85%,rgba(91,60,245,.07),transparent 55%)}
+.kmc-av{width:88px;height:88px;border-radius:50%;font-size:28px;font-weight:800;display:flex;align-items:center;justify-content:center;margin-bottom:13px;position:relative;z-index:1;font-family:"Syne",sans-serif}
+.kmc-ring{position:absolute;inset:-5px;border-radius:50%;background:var(--g1);opacity:.18;animation:ring 3s ease infinite}
+@keyframes ring{0%,100%{transform:scale(1);opacity:.18}50%{transform:scale(1.1);opacity:.06}}
+.kmc-name{font-family:"Syne",sans-serif;font-size:23px;color:var(--ink);letter-spacing:-.3px;text-align:center;position:relative;z-index:1}
+.kmc-role{font-size:12.5px;color:var(--sub);text-align:center;margin-bottom:15px;position:relative;z-index:1}
+.kmc-score{background:var(--bg);border:1.5px solid var(--border);border-radius:20px;padding:12px 24px;text-align:center;margin-bottom:14px;width:100%}
+.kmc-pct{font-family:"Syne",sans-serif;font-size:46px;background:var(--g1);-webkit-background-clip:text;background-clip:text;color:transparent;line-height:1}
+.kmc-lbl{font-size:11.5px;color:var(--mute);margin-top:2px}
+.kmc-tags{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin-bottom:18px}
+.kmc-btns{display:flex;align-items:center;justify-content:center;gap:14px;width:100%}
+.kmc-action{width:54px;height:54px;border-radius:50%;background:var(--card);border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:22px;cursor:pointer;transition:all .14s}
+.kmc-action:active{transform:scale(.84)}
+.kmc-cta{height:52px;padding:0 30px;border-radius:30px;background:var(--g1);color:#fff;font-family:"Syne",sans-serif;font-size:15px;font-weight:700;border:none;cursor:pointer;box-shadow:0 5px 20px rgba(91,60,245,.36);transition:transform .14s}
+.kmc-cta:active{transform:scale(.93)}
+.kmc-prog{text-align:center;font-size:12px;color:var(--mute);margin-top:6px}
+
+/* ══════════════ MENTORSHIP ══════════════ */
+.mentor-card{background:var(--card);border:1.5px solid var(--border);border-radius:22px;padding:16px;margin:0 18px 10px}
+.mc-top{display:flex;align-items:flex-start;gap:12px;margin-bottom:10px}
+.mc-info{flex:1}
+.mc-name{font-family:"Syne",sans-serif;font-size:15px;color:var(--ink)}
+.mc-role{font-size:12.5px;color:var(--sub);margin-top:2px}
+.mc-exp{display:flex;gap:4px;flex-wrap:wrap;margin:4px 0 0}
+.mc-rate-row{display:flex;align-items:center;justify-content:space-between;padding-top:10px;border-top:1px solid rgba(91,60,245,.06)}
+.mc-slots{font-size:12px;color:var(--mute)}
+.mc-slots strong{color:var(--gr);font-weight:700}
+.mc-mode{font-size:11px;color:var(--mute);background:var(--bg);padding:4px 10px;border-radius:20px;font-weight:600}
+
+/* ══════════════ VENTURES ══════════════ */
+.vi-card{background:var(--card);border:1.5px solid var(--border);border-radius:22px;overflow:hidden;margin:0 18px 10px}
+.vi-bar{height:5px}
+.vi-body{padding:16px}
+.vi-stage-row{display:flex;align-items:center;gap:7px;flex-wrap:wrap;margin-bottom:7px}
+.vi-title{font-family:"Syne",sans-serif;font-size:16px;color:var(--ink);margin-bottom:3px}
+.vi-sector{font-size:12.5px;color:var(--mute);margin-bottom:10px}
+.vi-desc{font-size:13px;color:var(--sub);line-height:1.65;margin-bottom:12px}
+.vi-metrics{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+.vi-metric{background:var(--bg);border-radius:12px;padding:8px 12px;text-align:center;min-width:72px}
+.vi-metric-n{font-family:"Syne",sans-serif;font-size:16px;color:var(--ink)}
+.vi-metric-l{font-size:10px;color:var(--mute);font-weight:600;text-transform:uppercase;letter-spacing:.05em;margin-top:1px}
+.vi-foot{border-top:1px solid rgba(91,60,245,.06);padding-top:12px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px}
+.vi-poster{display:flex;align-items:center;gap:9px}
+.vi-poster-name{font-size:12.5px;font-weight:700;color:var(--ink)}
+.vi-poster-b{font-size:11px;color:var(--mute)}
+.vi-seek{font-size:13px;font-weight:700;color:var(--pu)}
+.vi-btns{display:flex;gap:8px;margin-top:12px}
+
+/* ══════════════ EVENTS ══════════════ */
+.event-card{background:var(--card);border:1.5px solid var(--border);border-radius:20px;overflow:hidden;margin:0 16px 8px}
+.ev-bar{height:5px}
+.ev-header{display:flex;align-items:center;justify-content:space-between;padding:12px 14px 6px}
+.ev-cover-title{font-family:"Syne",sans-serif;font-size:15px;color:var(--ink);line-height:1.25;flex:1;padding-right:8px}
+.ev-cover-badge{background:var(--bg);border:1.5px solid var(--border);color:var(--sub);font-size:10px;font-weight:800;padding:3px 9px;border-radius:20px;flex-shrink:0}
+.ev-body{padding:0 14px 12px}
+.ev-row{display:flex;align-items:center;gap:6px;font-size:12.5px;color:var(--sub);margin-bottom:4px}
+.ev-row svg{width:13px;height:13px;stroke:var(--mute);fill:none;stroke-width:2;flex-shrink:0}
+.ev-desc{font-size:12.5px;color:var(--sub);line-height:1.55;margin:6px 0 10px}
+.ev-foot{border-top:1px solid rgba(91,60,245,.06);padding-top:12px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px}
+.ev-attending{display:flex;align-items:center;gap:8px}
+.ev-count{font-size:12px;color:var(--mute)}
+.ev-price{font-family:"Syne",sans-serif;font-size:16px;color:var(--pu)}
+.ev-price small{font-size:11px;font-weight:500;color:var(--mute)}
+
+/* ══════════════ JOBS ══════════════ */
+.job-card{background:var(--card);border:1.5px solid var(--border);border-radius:22px;padding:16px;margin:0 18px 10px}
+.jc-top{display:flex;align-items:flex-start;gap:12px;margin-bottom:10px}
+.jc-co{flex:1}
+.jc-co-name{font-family:"Syne",sans-serif;font-size:14px;color:var(--ink)}
+.jc-co-loc{font-size:12px;color:var(--mute);margin-top:1px}
+.jc-title{font-size:16px;font-weight:700;color:var(--ink);margin-bottom:4px}
+.jc-details{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px}
+.jc-referrer{background:rgba(91,60,245,.06);border-radius:12px;padding:9px 12px;display:flex;align-items:center;gap:9px;margin-bottom:11px}
+.jc-ref-txt{font-size:12px;color:var(--sub)}<br>
+.jc-ref-txt strong{color:var(--pu);font-weight:700}
+.jc-btns{display:flex;gap:7px}
+
+/* ══════════════ CONV ══════════════ */
+.conv-bar{height:64px;background:rgba(255,255,255,.92);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px;padding:0 16px;flex-shrink:0}
+.conv-back{width:34px;height:34px;border-radius:11px;background:var(--bg);border:1.5px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer}
+.conv-back svg{width:16px;height:16px;stroke:var(--sub);fill:none;stroke-width:2.5}
+.msgs{flex:1;overflow-y:auto;padding:14px 18px;display:flex;flex-direction:column;gap:4px;scrollbar-width:none;background:var(--bg)}
+.msgs::-webkit-scrollbar{display:none}
+.mr{display:flex;align-items:flex-end;gap:8px}
+.mr.me{flex-direction:row-reverse}
+.bub{max-width:73%;padding:10px 14px;font-size:14px;line-height:1.5;word-break:break-word;border-radius:20px}
+.bub.them{background:var(--card);border:1px solid var(--border);color:var(--ink);border-bottom-left-radius:5px}
+.bub.me{background:var(--g1);color:#fff;border-bottom-right-radius:5px}
+.day-sep{text-align:center;font-size:11.5px;color:var(--mute);background:rgba(255,255,255,.8);padding:3px 14px;border-radius:20px;margin:8px auto;width:fit-content}
+.typing-row{display:flex;align-items:center;gap:8px;padding:4px 0}
+.typing-bub{background:var(--card);border:1px solid var(--border);border-radius:20px;border-bottom-left-radius:5px;padding:11px 16px;display:flex;gap:5px}
+.dot{width:7px;height:7px;border-radius:50%;background:var(--mute);animation:ty .8s ease infinite}
+.dot:nth-child(2){animation-delay:.15s}.dot:nth-child(3){animation-delay:.3s}
+@keyframes ty{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-6px)}}
+.chat-bar2{padding:10px 16px 12px;background:rgba(255,255,255,.95);backdrop-filter:blur(20px);border-top:1px solid var(--border);display:flex;gap:9px;align-items:center;flex-shrink:0}
+.chat-inp{flex:1;padding:11px 15px;border-radius:24px;border:1.5px solid var(--border);background:var(--bg);font-size:14px;color:var(--ink);font-family:"DM Sans",sans-serif;outline:none;resize:none;max-height:90px;line-height:1.4}
+.chat-inp:focus{border-color:rgba(91,60,245,.4)}
+.send-btn{width:42px;height:42px;border-radius:50%;background:var(--g1);border:none;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 3px 12px rgba(91,60,245,.36);transition:transform .13s;flex-shrink:0}
+.send-btn:active{transform:scale(.88)}
+.send-btn svg{width:17px;height:17px;stroke:#fff;fill:none;stroke-width:2.5}
+
+/* ══════════════ CHAT LIST ══════════════ */
+.chat-row{display:flex;align-items:center;gap:13px;padding:13px 18px;border-bottom:1px solid rgba(91,60,245,.06);cursor:pointer;transition:background .1s}
+.chat-row:active{background:rgba(91,60,245,.03)}
+.chat-av-w{position:relative;flex-shrink:0}
+.odot{position:absolute;bottom:1px;right:1px;width:10px;height:10px;background:#34C759;border-radius:50%;border:2px solid var(--bg)}
+.chat-inf{flex:1;min-width:0}
+.chat-nm{font-size:14.5px;font-weight:700;color:var(--ink)}
+.chat-pr{font-size:12.5px;color:var(--mute);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px}
+.chat-mt{display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex-shrink:0}
+.chat-tm{font-size:11px;color:var(--dim)}
+.chat-ud{background:#FF3B30;color:#fff;font-size:10px;font-weight:800;padding:1px 6px;border-radius:20px}
+
+/* ══════════════ PROFILE ══════════════ */
+.prf-hero{margin:0 18px 13px;background:var(--card);border:1.5px solid var(--border);border-radius:26px;padding:22px;text-align:center}
+.prf-av{width:82px;height:82px;border-radius:50%;background:var(--g1);display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:800;color:#fff;margin:0 auto 13px;box-shadow:0 5px 22px rgba(91,60,245,.32);position:relative;font-family:"Syne",sans-serif}
+.prf-ed{position:absolute;bottom:2px;right:2px;width:24px;height:24px;border-radius:50%;background:var(--card);border:2px solid var(--bg);display:flex;align-items:center;justify-content:center;font-size:12px}
+.prf-name{font-family:"Syne",sans-serif;font-size:21px;color:var(--ink);margin-bottom:4px}
+.prf-role{font-size:13px;color:var(--sub);margin-bottom:11px;line-height:1.5}
+.prf-tags{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin-bottom:14px}
+.prf-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--border);border-radius:16px;overflow:hidden;margin-bottom:15px}
+.pss{background:var(--card);padding:10px 6px;text-align:center}
+.psn{font-family:"Syne",sans-serif;font-size:18px;color:var(--ink)}
+.psl{font-size:9px;font-weight:700;color:var(--mute);text-transform:uppercase;letter-spacing:.05em;margin-top:2px}
+.prf-btns{display:flex;gap:8px}
+.prf-sec{margin:0 18px 10px;background:var(--card);border:1.5px solid var(--border);border-radius:22px;overflow:hidden}
+.prf-sec-hdr{padding:14px 16px 12px;font-family:"Syne",sans-serif;font-size:14px;color:var(--ink);display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(91,60,245,.07)}
+.prf-row{display:flex;align-items:center;gap:10px;padding:11px 16px;border-bottom:1px solid rgba(91,60,245,.07)}
+.prf-row:last-child{border-bottom:none}
+.prf-lbl{font-size:12px;color:var(--mute);width:88px;flex-shrink:0;font-weight:600}
+.prf-val{font-size:13.5px;color:var(--ink);flex:1}
+.li-sec{margin:0 18px 10px;background:#EDEDFF;border:1.5px solid rgba(91,60,245,.18);border-radius:22px;padding:17px}
+.li-t{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:var(--pu);margin-bottom:5px}
+.li-d{font-size:12.5px;color:var(--sub);line-height:1.6;margin-bottom:11px}
+.li-row{display:flex;gap:8px}
+.li-inp{flex:1;padding:10px 13px;border-radius:13px;border:1.5px solid rgba(91,60,245,.2);background:#fff;font-size:13px;color:var(--ink);font-family:"DM Sans",sans-serif;outline:none}
+.li-stat{display:flex;justify-content:space-between;margin-top:8px;font-size:11.5px}
+.li-ok{color:#059669;font-weight:700}.li-nxt{color:var(--mute)}
+.tog-row{display:flex;align-items:center;gap:12px;padding:13px 16px;border-bottom:1px solid rgba(91,60,245,.07)}
+.tog-row:last-child{border-bottom:none}
+.tog-info{flex:1}
+.tog-t{font-size:13.5px;color:var(--ink);font-weight:600}
+.tog-s{font-size:11.5px;color:var(--mute);margin-top:1px}
+/* ═══ ME HUB ═══ */
+.me-hub-list{padding:0 18px;display:flex;flex-direction:column;gap:9px}
+.me-hub-item{background:var(--card);border:1.5px solid var(--border);border-radius:18px;padding:14px 16px;display:flex;align-items:center;gap:13px;cursor:pointer;transition:transform .12s}
+.me-hub-item:active{transform:scale(.975)}
+.me-hub-info{flex:1}
+.me-hub-title{font-size:14px;font-weight:700;color:var(--ink)}
+.me-hub-sub{font-size:12px;color:var(--mute);margin-top:1px}
+.me-hub-arrow{stroke:var(--dim);fill:none;stroke-width:2;flex-shrink:0;width:16px;height:16px}
+
+/* ── SWIPE OVERLAYS ── */
+.swipe-label{position:absolute;top:28px;padding:6px 16px;border-radius:12px;font-family:"Syne",sans-serif;font-size:22px;font-weight:800;letter-spacing:-.5px;border:3px solid;opacity:0;transition:opacity .1s;pointer-events:none;z-index:10}
+.swipe-label.yes{left:20px;color:#00BF6F;border-color:#00BF6F;transform:rotate(-12deg)}
+.swipe-label.nope{right:20px;color:#FF3B30;border-color:#FF3B30;transform:rotate(12deg)}
+/* ── ALGO BREAKDOWN ── */
+.algo-rows{display:flex;flex-direction:column;gap:6px;width:100%;margin-bottom:14px}
+.algo-row{display:flex;align-items:center;gap:8px;font-size:11.5px}
+.algo-label{color:var(--mute);width:110px;flex-shrink:0}
+.algo-bar-track{flex:1;height:5px;background:var(--border);border-radius:30px;overflow:hidden}
+.algo-bar-fill{height:100%;border-radius:30px;transition:width 1s cubic-bezier(.4,0,.2,1)}
+.algo-val{color:var(--ink);font-weight:700;width:28px;text-align:right;flex-shrink:0}
+/* ── LI BADGE ON CARD ── */
+.kmc-li-badge{display:flex;align-items:center;gap:6px;background:#EBF3FB;border:1px solid #BFDBF0;border-radius:10px;padding:6px 12px;font-size:12px;font-weight:700;color:#0A66C2;cursor:pointer;margin-bottom:12px;width:100%;justify-content:center;transition:background .15s}
+.kmc-li-badge:active{background:#D6EAF8}
+.kmc-li-badge svg{flex-shrink:0}
+</style>
+</head>
+<body>
+<div id="app">
+<div class="screens">
+
+<!-- ═══ FEED ═══ -->
+<div class="scr on" id="s-feed">
+  <div class="bar">
+    <div style="display:flex;align-items:center;gap:9px">
+      <div class="bar-gem"><svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg></div>
+      <div class="wordmark">K·Network</div>
+    </div>
+    <div class="bar-r">
+      <div class="ib" onclick="openNotif()"><svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg><div class="rdot"></div></div>
+      <div class="ib" onclick="openChat(1)"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg><div class="rdot"></div></div>
+    </div>
+  </div>
+  <div class="sa">
+    <div class="fp-compose" onclick="openPost()"><div class="fp-compose-av">RK</div><div class="fp-compose-ph">Share with the IIMK community…</div><button class="fp-compose-post">Post</button></div>
+    <div class="chips" id="feed-chips">
+      <div class="chip on" onclick="setFF(this,'all')">All</div>
+      <div class="chip" onclick="setFF(this,'startup')">Startups</div>
+      <div class="chip" onclick="setFF(this,'job')">Jobs</div>
+      <div class="chip" onclick="setFF(this,'event')">Events</div>
+      <div class="chip" onclick="setFF(this,'insight')">Insights</div>
+    </div>
+    <div id="feed-list"></div>
+    <div style="height:24px"></div>
+  </div>
+</div>
+
+<!-- ═══ NETWORK HUB ═══ -->
+<div class="scr" id="s-net">
+  <div class="bar"><div class="bar-t">Network</div></div>
+  <div class="sa">
+    <div class="hub-tiles">
+      <div class="hub-tile" style="background:#FFF0EB;border-color:#FFD5C8" onclick="go('dir')">
+        <div class="hub-tile-title" style="color:#9A3412">Alumni Directory</div>
+        <div class="hub-tile-sub" style="color:#C2572A">4,812 IIMK alumni</div>
+        <div class="hub-tile-right"><span class="hub-tile-count" style="background:#fff;color:#C2410C">4,812</span><span class="hub-tile-arrow" style="color:#C2410C">→</span></div>
+      </div>
+      <div class="hub-tile" style="background:#EDEDFF;border-color:#C7C5F0" onclick="go('km')">
+        <div class="hub-tile-title" style="color:#3730A3">K-Match</div>
+        <div class="hub-tile-sub" style="color:#5B4FD4">Smart matching</div>
+        <div class="hub-tile-right"><span class="hub-tile-count" style="background:#fff;color:#3730A3">3 new</span><span class="hub-tile-arrow" style="color:#3730A3">→</span></div>
+      </div>
+      <div class="hub-tile" style="background:#ECFDF5;border-color:#A7F3D0" onclick="go('mentor')">
+        <div class="hub-tile-title" style="color:#065F46">Mentorship</div>
+        <div class="hub-tile-sub" style="color:#047857">Senior alumni mentors</div>
+        <div class="hub-tile-right"><span class="hub-tile-count" style="background:#fff;color:#065F46">24 active</span><span class="hub-tile-arrow" style="color:#065F46">→</span></div>
+      </div>
+      <div class="hub-tile" style="background:#FFFBEB;border-color:#FDE68A" onclick="go('jobs')">
+        <div class="hub-tile-title" style="color:#78350F">Jobs & Referrals</div>
+        <div class="hub-tile-sub" style="color:#92400E">Alumni hiring network</div>
+        <div class="hub-tile-right"><span class="hub-tile-count" style="background:#fff;color:#78350F">127 open</span><span class="hub-tile-arrow" style="color:#78350F">→</span></div>
+      </div>
+      <div class="hub-tile" style="background:#EFF6FF;border-color:#BFDBFE;grid-column:1/-1" onclick="go('companies')">
+        <div class="hub-tile-title" style="color:#1D4ED8">Alumni Company Directory</div>
+        <div class="hub-tile-sub" style="color:#3B82F6">Companies founded or led by IIMK alumni</div>
+        <div class="hub-tile-right"><span class="hub-tile-count" style="background:#fff;color:#1D4ED8">214 companies</span><span class="hub-tile-arrow" style="color:#1D4ED8">→</span></div>
+      </div>
+    </div>
+    <div style="padding:0 18px"><div class="sec">Suggested connections</div></div>
+    <div id="suggested-list"></div>
+    <div style="height:24px"></div>
+  </div>
+</div>
+
+<!-- ═══ DIRECTORY ═══ -->
+<div class="scr" id="s-dir">
+  <div class="bar">
+    <div class="ib" onclick="go('net')" style="margin-right:4px"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg></div>
+    <div class="bar-t">Alumni Directory</div>
+    <div class="bar-r"><div class="ib" onclick="showToast('Invite link copied!')"><svg viewBox="0 0 24 24"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg></div></div>
+  </div>
+  <div class="sbar"><svg class="sico" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg><input class="sinp" id="alq" placeholder="Name, company, role, city…" oninput="renderAl()"/></div>
+  <div class="chips" id="yr-chips"><div class="chip on" onclick="setYr(this,'all')">All</div><div class="chip" onclick="setYr(this,'2024')">2024</div><div class="chip" onclick="setYr(this,'2022')">2022</div><div class="chip" onclick="setYr(this,'2019')">2019</div><div class="chip" onclick="setYr(this,'2016')">2016</div><div class="chip" onclick="setYr(this,'2013')">2013</div><div class="chip" onclick="setYr(this,'2010')">2010</div><div class="chip" onclick="setYr(this,'2007')">2007</div></div>
+  <div class="sa"><div class="al-card-wrap" id="al-list"></div><div style="height:24px"></div></div>
+</div>
+
+<!-- ═══ K-MATCH ═══ -->
+<div class="scr" id="s-km">
+  <div class="bar">
+    <div class="ib" onclick="go('net')" style="margin-right:4px"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg></div>
+    <div class="bar-t">K-Match</div>
+    <div class="bar-r"><div class="ib" onclick="showToast('Filters saved!')"><svg viewBox="0 0 24 24"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg></div></div>
+  </div>
+  <div class="chips" id="kmf-chips"><div class="chip on" onclick="setKmf(this,'all')">All</div><div class="chip" onclick="setKmf(this,'investor')">Investors</div><div class="chip" onclick="setKmf(this,'founder')">Founders</div><div class="chip" onclick="setKmf(this,'exec')">Execs</div><div class="chip" onclick="setKmf(this,'batch')">My batch</div></div>
+  <div class="sa" style="overflow:hidden"><div class="kmdeck"><div class="kmghost g2"></div><div class="kmghost g1"></div><div class="kmc" id="kmc"></div></div><div class="kmc-prog" id="kmprog"></div><div class="swipe-hint"><span>← Skip</span><span style="color:var(--dim)">Swipe or tap</span><span>Connect →</span></div></div>
+</div>
+
+<!-- ═══ MENTORSHIP ═══ -->
+<div class="scr" id="s-mentor">
+  <div class="bar">
+    <div class="ib" onclick="go('net')" style="margin-right:4px"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg></div>
+    <div class="bar-t">Mentorship</div>
+    <div class="bar-r"><div class="ib" onclick="openPost()"><svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></div></div>
+  </div>
+  <!-- Mode tabs -->
+  <div style="display:flex;margin:0 18px 12px;background:var(--bg);border-radius:14px;padding:4px;border:1.5px solid var(--border)">
+    <div id="mt-offer" onclick="setMentorMode('offer')" style="flex:1;text-align:center;padding:9px;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;background:var(--card);color:var(--ink);box-shadow:0 1px 4px rgba(0,0,0,.06)">Find a mentor</div>
+    <div id="mt-seek" onclick="setMentorMode('seek')" style="flex:1;text-align:center;padding:9px;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;color:var(--mute)">Seeking mentors</div>
+  </div>
+  <div class="chips" id="mf-chips"><div class="chip on" onclick="setMF(this,'all')">All tracks</div><div class="chip" onclick="setMF(this,'career')">Career</div><div class="chip" onclick="setMF(this,'startup')">Startup</div><div class="chip" onclick="setMF(this,'finance')">Finance</div><div class="chip" onclick="setMF(this,'mba')">MBA prep</div></div>
+  <div class="sa"><div id="mentor-list"></div><div style="height:24px"></div></div>
+</div>
+
+<!-- ═══ GROUPS ═══ -->
+<div class="scr" id="s-groups">
+  <div class="bar">
+    <div class="ib" onclick="go('net')" style="margin-right:4px"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg></div>
+    <div class="bar-t">Interest Groups</div>
+  </div>
+  <div class="sa"><div style="padding:0 18px 12px;font-size:13px;color:var(--sub)">Join groups — get WhatsApp alerts when matching opportunities are posted</div><div id="grp-list"></div><div style="height:24px"></div></div>
+</div>
+
+<!-- ═══ VENTURES HUB ═══ -->
+<div class="scr" id="s-ventures">
+  <div class="bar"><div class="bar-t">Ventures</div></div>
+  <div class="sa">
+    <div class="hub-tiles">
+      <div class="hub-tile" style="background:#FFF0EB;border-color:#FFD5C8" onclick="go('fi')">
+        <div class="hub-tile-title" style="color:#9A3412">Founder — Investor</div>
+        <div class="hub-tile-sub" style="color:#C2572A">Pitch · browse · intro</div>
+        <div class="hub-tile-right"><span class="hub-tile-count" style="background:#fff;color:#C2410C">14 active</span><span class="hub-tile-arrow" style="color:#C2410C">→</span></div>
+      </div>
+      <div class="hub-tile" style="background:#EDEDFF;border-color:#C7C5F0" onclick="go('syn')">
+        <div class="hub-tile-title" style="color:#3730A3">K-Syndicate</div>
+        <div class="hub-tile-sub" style="color:#5B4FD4">Co-invest with alumni</div>
+        <div class="hub-tile-right"><span class="hub-tile-count" style="background:#fff;color:#3730A3">3 deals</span><span class="hub-tile-arrow" style="color:#3730A3">→</span></div>
+      </div>
+      <div class="hub-tile" style="background:#ECFDF5;border-color:#A7F3D0;grid-column:1/-1" onclick="go('collab')">
+        <div class="hub-tile-title" style="color:#065F46">Collaborations</div>
+        <div class="hub-tile-sub" style="color:#047857">Businesses seeking and offering collaboration</div>
+        <div class="hub-tile-right"><span class="hub-tile-count" style="background:#fff;color:#065F46">18 active</span><span class="hub-tile-arrow" style="color:#065F46">→</span></div>
+      </div>
+    </div>
+    <div style="padding:0 18px"><div class="sec">Latest startups pitching</div></div>
+    <div style="margin:0 18px;background:var(--card);border:1.5px solid var(--border);border-radius:20px;overflow:hidden"><div id="ventures-preview"></div></div>
+    <div style="height:24px"></div>
+  </div>
+</div>
+
+<!-- ═══ FOUNDER-INVESTOR ═══ -->
+<div class="scr" id="s-fi">
+  <div class="bar">
+    <div class="ib" onclick="go('ventures')" style="margin-right:4px"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg></div>
+    <div class="bar-t">Startup Pitches</div>
+    <div class="bar-r"><div class="ib" onclick="openPitch()"><svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></div></div>
+  </div>
+  <div class="chips" id="fi-chips"><div class="chip on" onclick="setFI(this,'all')">All</div><div class="chip" onclick="setFI(this,'fintech')">FinTech</div><div class="chip" onclick="setFI(this,'saas')">SaaS</div><div class="chip" onclick="setFI(this,'d2c')">D2C</div><div class="chip" onclick="setFI(this,'cleantech')">CleanTech</div><div class="chip" onclick="setFI(this,'health')">Health</div></div>
+  <div class="sa"><div id="fi-list"></div><div style="height:24px"></div></div>
+</div>
+
+<!-- ═══ SYNDICATE ═══ -->
+<div class="scr" id="s-syn">
+  <div class="bar">
+    <div class="ib" onclick="go('ventures')" style="margin-right:4px"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg></div>
+    <div class="bar-t">K-Syndicate</div>
+    <div class="bar-r"><div class="ib" onclick="showToast('Deal submitted to committee!')"><svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></div></div>
+  </div>
+  <div class="sa">
+    <div style="margin:0 18px 14px;background:var(--g2);border-radius:22px;padding:20px">
+      <div style="font-family:Syne,sans-serif;font-size:18px;color:#fff;margin-bottom:4px">Fractional Co-Investment</div>
+      <div style="font-size:12.5px;color:rgba(255,255,255,.8);line-height:1.5">Pool capital with alumni · SEBI-compliant LLP SPV · Min ₹1L</div>
+      <div style="display:flex;gap:18px;margin-top:13px">
+        <div style="color:#fff"><div style="font-family:Syne,sans-serif;font-size:21px">₹12.8Cr</div><div style="font-size:10.5px;opacity:.75;font-weight:700;margin-top:1px">TOTAL DEPLOYED</div></div>
+        <div style="color:#fff"><div style="font-family:Syne,sans-serif;font-size:21px">2.4x</div><div style="font-size:10.5px;opacity:.75;font-weight:700;margin-top:1px">AVG MOIC</div></div>
+        <div style="color:#fff"><div style="font-family:Syne,sans-serif;font-size:21px">18</div><div style="font-size:10.5px;opacity:.75;font-weight:700;margin-top:1px">DEALS DONE</div></div>
+      </div>
+    </div>
+    <div style="padding:0 18px"><div class="sec">Active deals</div></div>
+    <div id="syn-list"></div>
+    <div style="height:24px"></div>
+  </div>
+</div>
+
+<!-- ═══ COLLABORATIONS ═══ -->
+<div class="scr" id="s-collab">
+  <div class="bar">
+    <div class="ib" onclick="go('ventures')" style="margin-right:4px"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg></div>
+    <div class="bar-t">Collaborations</div>
+    <div class="bar-r"><div class="ib" onclick="openPost()"><svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></div></div>
+  </div>
+  <!-- Mode tabs -->
+  <div style="display:flex;margin:0 18px 12px;background:var(--bg);border-radius:14px;padding:4px;border:1.5px solid var(--border)">
+    <div id="ct-seek" onclick="setCollabMode('seek')" style="flex:1;text-align:center;padding:9px;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;background:var(--card);color:var(--ink);box-shadow:0 1px 4px rgba(0,0,0,.06)">Seeking collab</div>
+    <div id="ct-offer" onclick="setCollabMode('offer')" style="flex:1;text-align:center;padding:9px;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;color:var(--mute)">Offering collab</div>
+  </div>
+  <div class="chips" id="cf-chips">
+    <div class="chip on" onclick="setCF(this,'all')">All</div>
+    <div class="chip" onclick="setCF(this,'tech')">Tech / SaaS</div>
+    <div class="chip" onclick="setCF(this,'fintech')">FinTech</div>
+    <div class="chip" onclick="setCF(this,'media')">Media</div>
+    <div class="chip" onclick="setCF(this,'d2c')">D2C</div>
+    <div class="chip" onclick="setCF(this,'consulting')">Consulting</div>
+  </div>
+  <div class="sa"><div id="collab-list"></div><div style="height:24px"></div></div>
+</div>
+
+<!-- ═══ EVENTS ═══ -->
+<div class="scr" id="s-events">
+  <div class="bar"><div class="bar-t">Events</div><div class="bar-r"><div class="ib" onclick="showToast('Calendar synced!')"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div></div></div>
+  <div class="chips" id="ev-chips"><div class="chip on" onclick="setEV(this,'all')">All cities</div><div class="chip" onclick="setEV(this,'hyd')">Hyderabad</div><div class="chip" onclick="setEV(this,'blr')">Bengaluru</div><div class="chip" onclick="setEV(this,'mum')">Mumbai</div><div class="chip" onclick="setEV(this,'dxb')">Dubai</div><div class="chip" onclick="setEV(this,'us')">US</div><div class="chip" onclick="setEV(this,'online')">Online</div></div>
+  <div style="margin:0 18px 10px;background:#FFFBEB;border:1.5px solid #FDE68A;border-radius:14px;padding:10px 14px;font-size:12.5px;color:#78350F;display:flex;align-items:center;gap:8px">
+    <span>⚠</span><span>New chapters require <strong>30+ verified members</strong> and a committed admin before launch. Ensures quality for all alumni.</span>
+  </div>
+  <div class="sa"><div id="ev-list"></div><div style="height:24px"></div></div>
+</div>
+
+<!-- ═══ ME HUB ═══ -->
+<div class="scr" id="s-me">
+  <div class="bar">
+    <div style="display:flex;align-items:center;gap:11px;flex:1">
+      <div class="prf-av" style="width:42px;height:42px;font-size:15px;margin:0;box-shadow:none">RK<div class="prf-ed" style="width:20px;height:20px;font-size:10px"></div></div>
+      <div><div style="font-family:Syne,sans-serif;font-size:15px;color:var(--ink)">Ravan Kulkarni</div><div style="font-size:11.5px;color:var(--mute)">Batch '16 · VP Alumni · Hyderabad</div></div>
+    </div>
+    <div class="ib" onclick="go('profile')"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>
+  </div>
+  <div class="sa">
+    <div style="padding:0 18px 14px">
+      <div style="background:var(--g1);border-radius:20px;padding:16px 18px;display:flex;align-items:center;justify-content:space-between">
+        <div><div style="font-size:12px;color:rgba(255,255,255,.8);font-weight:600;text-transform:uppercase;letter-spacing:.05em">Profile completion</div><div style="font-family:Syne,sans-serif;font-size:22px;color:#fff;margin-top:3px">78%</div></div>
+        <button class="btn bsm" style="background:rgba(255,255,255,.2);color:#fff;border:1px solid rgba(255,255,255,.25)" onclick="go('profile')">Complete →</button>
+      </div>
+    </div>
+    <div class="me-hub-list">
+      <div class="me-hub-item" onclick="go('profile')"><div class="me-hub-info"><div class="me-hub-title">My Profile</div><div class="me-hub-sub">Edit details, LinkedIn sync, preferences</div></div><svg class="me-hub-arrow" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></div>
+      <div class="me-hub-item" onclick="go('chat')"><div class="me-hub-info"><div class="me-hub-title">Messages</div><div class="me-hub-sub">5 unread conversations</div></div><svg class="me-hub-arrow" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></div>
+      <div class="me-hub-item" onclick="go('syn')"><div class="me-hub-info"><div class="me-hub-title">My Investments</div><div class="me-hub-sub">₹5L committed · 2 active deals</div></div><svg class="me-hub-arrow" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></div>
+      <div class="me-hub-item" onclick="go('leaderboard')"><div class="me-hub-info"><div class="me-hub-title">Referral Leaderboard</div><div class="me-hub-sub">Top connectors, deal-makers, referrers</div></div><svg class="me-hub-arrow" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></div>
+      <div class="me-hub-item" onclick="go('reunion')"><div class="me-hub-info"><div class="me-hub-title">Batch Reunion Planner</div><div class="me-hub-sub">Plan your batch reunion · Batch '16</div></div><svg class="me-hub-arrow" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></div>
+      <div class="me-hub-item" onclick="showToast('Settings coming soon!')"><div class="me-hub-info"><div class="me-hub-title">Settings</div><div class="me-hub-sub">Privacy, notifications, account</div></div><svg class="me-hub-arrow" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></div>
+    </div>
+    <div style="padding:20px 18px;text-align:center;font-size:12px;color:var(--dim)">K·Network v2.0 · IIMK Alumni Association · 2025–27</div>
+  </div>
+</div>
+
+<!-- ═══ PROFILE ═══ -->
+<div class="scr" id="s-profile">
+  <div class="bar">
+    <div class="ib" onclick="go('me')" style="margin-right:4px"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg></div>
+    <div class="bar-t">My Profile</div>
+    <div class="bar-r"><div class="ib" onclick="showToast('Saved!')"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div></div>
+  </div>
+  <div class="sa">
+    <div class="prf-hero">
+      <div class="prf-av">RK<div class="prf-ed">✏️</div></div>
+      <div class="prf-name">Ravan Kulkarni</div>
+      <div class="prf-role">Country Manager · Directa24 · VP IIMK Alumni Association (2025–27)</div>
+      <div class="prf-tags"><span class="tag tor">FinTech</span><span class="tag tpu">SaaS</span><span class="tag tbl">EdTech</span><span class="tag tam">AI/ML</span></div>
+      <div class="prf-stats"><div class="pss"><div class="psn">142</div><div class="psl">Connects</div></div><div class="pss"><div class="psn">3</div><div class="psl">Groups</div></div><div class="pss"><div class="psn">₹5L</div><div class="psl">Invested</div></div><div class="pss"><div class="psn">2</div><div class="psl">Mentees</div></div></div>
+      <div class="prf-btns"><button class="btn bg bfull" style="flex:1" onclick="go('km')">Open K-Match</button><button class="btn bo bfull" style="flex:1" onclick="showToast('Link copied!')">Share</button></div>
+    </div>
+    <div class="prf-sec"><div class="prf-sec-hdr">Personal info <button class="btn bghost bxs" onclick="showToast('Edit mode')">Edit</button></div><div class="prf-row"><div class="prf-lbl">Batch</div><div class="prf-val">2016 · MBA Full-time</div></div><div class="prf-row"><div class="prf-lbl">Location</div><div class="prf-val">Hyderabad</div></div><div class="prf-row"><div class="prf-lbl">WhatsApp</div><div class="prf-val">+91 9xxxxxxx</div></div><div class="prf-row"><div class="prf-lbl">Open to</div><div class="prf-val">Connect · Mentor · Invest</div></div><div class="prf-row"><div class="prf-lbl">Industries</div><div class="prf-val">FinTech · SaaS · EdTech</div></div></div>
+    <div class="li-sec"><div class="li-t">LinkedIn Sync · Proxycurl</div><div class="li-d">Paste your profile URL — we scrape and auto-sync every 30 days. No login required.</div><div class="li-row"><input class="li-inp" value="linkedin.com/in/ravankulkarni"/><button class="btn bg bsm" onclick="showToast('Proxycurl sync triggered!')">Sync</button></div><div class="li-stat"><span class="li-ok">✓ Synced Apr 1, 2026</span><span class="li-nxt">Next: May 1</span></div></div>
+    <div class="prf-sec"><div class="prf-sec-hdr">Notifications</div><div class="tog-row"><div class="tog-info"><div class="tog-t">WhatsApp alerts</div><div class="tog-s">Matched opportunities</div></div><label class="tog"><input type="checkbox" checked/><div class="tog-sl"></div></label></div><div class="tog-row"><div class="tog-info"><div class="tog-t">K-Match pings</div><div class="tog-s">When alumni want to connect</div></div><label class="tog"><input type="checkbox" checked/><div class="tog-sl"></div></label></div><div class="tog-row"><div class="tog-info"><div class="tog-t">Syndicate alerts</div><div class="tog-s">New deals and milestones</div></div><label class="tog"><input type="checkbox" checked/><div class="tog-sl"></div></label></div><div class="tog-row"><div class="tog-info"><div class="tog-t">Event reminders</div><div class="tog-s">Chapter events near you</div></div><label class="tog"><input type="checkbox" checked/><div class="tog-sl"></div></label></div></div>
+    <div style="height:24px"></div>
+  </div>
+</div>
+
+<!-- ═══ JOBS ═══ -->
+<div class="scr" id="s-jobs">
+  <div class="bar">
+    <div class="ib" onclick="go('me')" style="margin-right:4px"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg></div>
+    <div class="bar-t">Jobs & Referrals</div>
+    <div class="bar-r"><div class="ib" onclick="openPost()"><svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></div></div>
+  </div>
+  <div class="chips" id="job-chips"><div class="chip on" onclick="setJobs(this,'all')">All roles</div><div class="chip" onclick="setJobs(this,'exec')">Leadership</div><div class="chip" onclick="setJobs(this,'product')">Product</div><div class="chip" onclick="setJobs(this,'finance')">Finance</div><div class="chip" onclick="setJobs(this,'tech')">Tech</div><div class="chip" onclick="setJobs(this,'sales')">Sales</div></div>
+  <div class="sa"><div id="jobs-list"></div><div style="height:24px"></div></div>
+</div>
+
+<!-- ═══ CHAT LIST ═══ -->
+<div class="scr" id="s-chat">
+  <div class="bar"><div class="bar-t">Messages</div><div class="bar-r"><div class="ib" onclick="showToast('New group created!')"><svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></div></div></div>
+  <div class="sa"><div id="chat-list"></div><div style="height:24px"></div></div>
+</div>
+
+<!-- ═══ CONVERSATION ═══ -->
+<div class="scr" id="s-cv" style="background:var(--bg)">
+  <div style="height:100%;display:flex;flex-direction:column">
+    <div class="conv-bar">
+      <div class="conv-back" onclick="prevScreen()"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg></div>
+      <div class="av" id="cv-av" style="width:38px;height:38px;font-size:12px;flex-shrink:0"></div>
+      <div style="flex:1"><div style="font-family:Syne,sans-serif;font-size:15px;color:var(--ink)" id="cv-name">—</div><div style="font-size:12px;color:#34C759;font-weight:600" id="cv-st">Online</div></div>
+      <div class="ib" onclick="showToast('Calling soon!')"><svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2A19.79 19.79 0 0 1 11.19 18.85a19.5 19.5 0 0 1-6-6A19.79 19.79 0 0 1 2.12 4.18 2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg></div>
+    </div>
+    <div class="msgs" id="msgs"></div>
+    <div class="chat-bar2"><textarea class="chat-inp" id="msg-inp" placeholder="Message…" rows="1" onkeypress="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendMsg()}" oninput="this.style.height='auto';this.style.height=Math.min(this.scrollHeight,90)+'px'"></textarea><div class="send-btn" onclick="sendMsg()"><svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg></div></div>
+  </div>
+</div>
+
+
+<!-- ═══ COMPANY DIRECTORY ═══ -->
+<div class="scr" id="s-companies">
+  <div class="bar">
+    <div class="ib" onclick="go('net')" style="margin-right:4px"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg></div>
+    <div class="bar-t">Company Directory</div>
+  </div>
+  <div class="sbar"><svg class="sico" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg><input class="sinp" id="coq" placeholder="Company name, sector, stage…" oninput="renderCompanies()"/></div>
+  <div class="chips" id="co-chips">
+    <div class="chip on" onclick="setCoFilter(this,'all')">All</div>
+    <div class="chip" onclick="setCoFilter(this,'fintech')">FinTech</div>
+    <div class="chip" onclick="setCoFilter(this,'saas')">SaaS</div>
+    <div class="chip" onclick="setCoFilter(this,'cleantech')">CleanTech</div>
+    <div class="chip" onclick="setCoFilter(this,'d2c')">D2C</div>
+    <div class="chip" onclick="setCoFilter(this,'health')">Health</div>
+  </div>
+  <div class="sa"><div id="co-list"></div><div style="height:24px"></div></div>
+</div>
+
+<!-- ═══ BATCH REUNION PLANNER ═══ -->
+<div class="scr" id="s-reunion">
+  <div class="bar">
+    <div class="ib" onclick="go('me')" style="margin-right:4px"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg></div>
+    <div class="bar-t">Batch Reunion Planner</div>
+  </div>
+  <div class="sa">
+    <!-- Your batch card -->
+    <div style="margin:0 18px 14px;background:var(--g1);border-radius:20px;padding:18px 20px">
+      <div style="font-family:Syne,sans-serif;font-size:18px;color:#fff;margin-bottom:3px">Batch '16 Reunion</div>
+      <div style="font-size:12.5px;color:rgba(255,255,255,.8)">10-year reunion · 2026 · 142 batch members on K·Network</div>
+      <div style="display:flex;gap:16px;margin-top:14px">
+        <div style="color:#fff"><div style="font-family:Syne,sans-serif;font-size:22px">89</div><div style="font-size:10px;opacity:.75;font-weight:700;margin-top:1px">INTERESTED</div></div>
+        <div style="color:#fff"><div style="font-family:Syne,sans-serif;font-size:22px">34</div><div style="font-size:10px;opacity:.75;font-weight:700;margin-top:1px">CONFIRMED</div></div>
+        <div style="color:#fff"><div style="font-family:Syne,sans-serif;font-size:22px">₹2,500</div><div style="font-size:10px;opacity:.75;font-weight:700;margin-top:1px">PER PERSON</div></div>
+      </div>
+    </div>
+    <!-- Status -->
+    <div style="margin:0 18px 14px;background:var(--card);border:1.5px solid var(--border);border-radius:18px;padding:14px 16px">
+      <div style="font-family:Syne,sans-serif;font-size:14px;color:var(--ink);margin-bottom:12px">Reunion details</div>
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <div style="display:flex;align-items:center;gap:10px;font-size:13px"><span style="color:var(--mute);width:70px;flex-shrink:0">Date</span><span style="color:var(--ink);font-weight:600">Jun 14, 2026 — Kozhikode</span></div>
+        <div style="display:flex;align-items:center;gap:10px;font-size:13px"><span style="color:var(--mute);width:70px;flex-shrink:0">Venue</span><span style="color:var(--ink);font-weight:600">IIM Kozhikode Campus + Taj Hotel</span></div>
+        <div style="display:flex;align-items:center;gap:10px;font-size:13px"><span style="color:var(--mute);width:70px;flex-shrink:0">Format</span><span style="color:var(--ink);font-weight:600">2-day · Campus tour · Dinner gala</span></div>
+        <div style="display:flex;align-items:center;gap:10px;font-size:13px"><span style="color:var(--mute);width:70px;flex-shrink:0">Deadline</span><span style="color:#EF4444;font-weight:600">May 15, 2026 · 31 days left</span></div>
+      </div>
+    </div>
+    <!-- RSVP -->
+    <div style="margin:0 18px 14px;background:var(--card);border:1.5px solid var(--border);border-radius:18px;padding:14px 16px">
+      <div style="font-family:Syne,sans-serif;font-size:14px;color:var(--ink);margin-bottom:12px">Your RSVP</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:14px">
+        <div id="rv-yes" onclick="setRSVP('yes')" style="padding:10px;border-radius:13px;border:2px solid var(--g1);background:#EDEDFF;text-align:center;cursor:pointer"><div style="font-size:18px">✅</div><div style="font-size:11.5px;font-weight:700;color:var(--pu);margin-top:4px">Attending</div></div>
+        <div id="rv-maybe" onclick="setRSVP('maybe')" style="padding:10px;border-radius:13px;border:1.5px solid var(--border);text-align:center;cursor:pointer"><div style="font-size:18px">🤔</div><div style="font-size:11.5px;font-weight:700;color:var(--mute);margin-top:4px">Maybe</div></div>
+        <div id="rv-no" onclick="setRSVP('no')" style="padding:10px;border-radius:13px;border:1.5px solid var(--border);text-align:center;cursor:pointer"><div style="font-size:18px">❌</div><div style="font-size:11.5px;font-weight:700;color:var(--mute);margin-top:4px">Can't make it</div></div>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">
+        <input style="flex:1;padding:10px 13px;border-radius:13px;border:1.5px solid var(--border);background:var(--bg);font-size:13px;font-family:DM Sans,sans-serif;outline:none;color:var(--ink)" placeholder="Bring a +1? Name:"/>
+      </div>
+      <button class="btn bg bfull" onclick="showToast('RSVP confirmed! Payment link sent via WhatsApp 🎉')">Confirm RSVP · Pay ₹2,500</button>
+    </div>
+    <!-- Batchmates attending -->
+    <div style="margin:0 18px 14px;background:var(--card);border:1.5px solid var(--border);border-radius:18px;overflow:hidden">
+      <div style="padding:14px 16px 10px;font-family:Syne,sans-serif;font-size:14px;color:var(--ink)">Batchmates confirmed</div>
+      <div id="reunion-attendees"></div>
+    </div>
+    <!-- WA reminder -->
+    <div style="margin:0 18px 14px;background:#E7F9ED;border:1.5px solid #B2DFBC;border-radius:18px;padding:13px 16px;font-size:13px;color:#1B5E20;line-height:1.6">
+      <strong>🔔 WhatsApp reminders</strong> will be sent to all Batch '16 members — 30 days, 7 days, and 1 day before the event. Manage this in your notification settings.
+    </div>
+    <div style="height:24px"></div>
+  </div>
+</div>
+
+<!-- ═══ REFERRAL LEADERBOARD ═══ -->
+<div class="scr" id="s-leaderboard">
+  <div class="bar">
+    <div class="ib" onclick="go('me')" style="margin-right:4px"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg></div>
+    <div class="bar-t">Referral Leaderboard</div>
+  </div>
+  <div class="chips" id="lb-chips">
+    <div class="chip on" onclick="setLB(this,'connects')">Connections</div>
+    <div class="chip" onclick="setLB(this,'intros')">Warm intros</div>
+    <div class="chip" onclick="setLB(this,'deals')">Deals closed</div>
+    <div class="chip" onclick="setLB(this,'referrals')">Job referrals</div>
+  </div>
+  <div class="sa">
+    <!-- Your rank -->
+    <div style="margin:0 18px 14px;background:var(--g2);border-radius:18px;padding:14px 16px;display:flex;align-items:center;gap:13px">
+      <div style="font-family:Syne,sans-serif;font-size:28px;color:#fff;font-weight:800;width:44px;text-align:center">#7</div>
+      <div style="flex:1"><div style="font-family:Syne,sans-serif;font-size:15px;color:#fff">Your rank this month</div><div style="font-size:12px;color:rgba(255,255,255,.75);margin-top:2px">142 connections · 8 intros made · 3 deals</div></div>
+      <div style="font-size:24px">🏅</div>
+    </div>
+    <div id="lb-list"></div>
+    <div style="height:24px"></div>
+  </div>
+</div>
+
+</div><!-- /screens -->
+
+<button class="fab" id="fab" onclick="openPost()"><svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></button>
+
+<div class="tabbar">
+  <div class="tab on" id="t-feed" onclick="go('feed')"><div class="tab-ic"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></div><div class="tab-l">Feed</div></div>
+  <div class="tab" id="t-net" onclick="go('net')"><div class="tab-ic"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div><div class="tab-l">Network</div><div class="tbadge">3</div></div>
+  <div class="tab" id="t-ventures" onclick="go('ventures')"><div class="tab-ic"><svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></div><div class="tab-l">Ventures</div></div>
+  <div class="tab" id="t-events" onclick="go('events')"><div class="tab-ic"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div><div class="tab-l">Events</div><div class="tbadge">5</div></div>
+  <div class="tab" id="t-me" onclick="go('me')"><div class="tab-ic"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div><div class="tab-l">Me</div></div>
+</div>
+
+<!-- NOTIF SHEET -->
+<div class="sov" id="n-ov" onclick="closeNotif()"><div class="sh" id="n-sh" onclick="event.stopPropagation()"><div class="sh-hnd"></div><div class="sh-hd"><div class="sh-t">Notifications</div><button class="btn bghost bxs" onclick="markRead()">Mark all read</button></div><div class="sh-b" id="n-body"></div></div></div>
+
+<!-- POST SHEET -->
+<div class="sov" id="p-ov" onclick="closePost()">
+  <div class="sh" id="p-sh" onclick="event.stopPropagation()">
+    <div class="sh-hnd"></div>
+    <div class="sh-hd"><div class="sh-t">Share with alumni</div><button class="btn bghost bxs" onclick="closePost()">✕</button></div>
+    <div class="sh-b" style="padding:0 20px 20px">
+      <div style="margin-top:12px;display:flex;align-items:center;gap:11px;margin-bottom:14px"><div class="prf-av" style="width:38px;height:38px;font-size:13px;margin:0;flex-shrink:0">RK</div><div><div style="font-size:14px;font-weight:700;color:var(--ink)">Ravan Kulkarni</div><div style="font-size:12px;color:var(--mute)">Posting to K·Network</div></div></div>
+      <div style="margin-bottom:12px;font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.05em;color:var(--sub)">Post type</div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:16px">
+        <div class="type-cell on" onclick="setPT(this)"><div style="font-size:18px">📝</div><div style="font-size:11px;font-weight:700;color:var(--sub);margin-top:4px">Update</div></div>
+        <div class="type-cell" onclick="setPT(this)"><div style="font-size:18px">💼</div><div style="font-size:11px;font-weight:700;color:var(--sub);margin-top:4px">Job/Opp</div></div>
+        <div class="type-cell" onclick="setPT(this)"><div style="font-size:18px">🚀</div><div style="font-size:11px;font-weight:700;color:var(--sub);margin-top:4px">Startup</div></div>
+        <div class="type-cell" onclick="setPT(this)"><div style="font-size:18px">📅</div><div style="font-size:11px;font-weight:700;color:var(--sub);margin-top:4px">Event</div></div>
+        <div class="type-cell" onclick="setPT(this)"><div style="font-size:18px">💡</div><div style="font-size:11px;font-weight:700;color:var(--sub);margin-top:4px">Insight</div></div>
+        <div class="type-cell" onclick="setPT(this)"><div style="font-size:18px">🙏</div><div style="font-size:11px;font-weight:700;color:var(--sub);margin-top:4px">Ask</div></div>
+      </div>
+      <textarea class="form-inp" style="width:100%;padding:13px 15px;border-radius:15px;border:1.5px solid var(--border);background:var(--bg);font-size:14px;color:var(--ink);font-family:DM Sans,sans-serif;outline:none;resize:none;min-height:100px;line-height:1.6;display:block;margin-bottom:14px" placeholder="What's on your mind? Share with the IIMK community…"></textarea>
+      <button class="btn bg bfull" onclick="closePost();showToast('Posted! Visible to 4,812 alumni 🎉')">Post to K·Network</button>
+    </div>
+  </div>
+</div>
+
+<!-- PITCH SHEET -->
+<div class="sov" id="pi-ov" onclick="closePitch()">
+  <div class="sh" id="pi-sh" onclick="event.stopPropagation()">
+    <div class="sh-hnd"></div>
+    <div class="sh-hd"><div class="sh-t">Submit startup pitch</div><button class="btn bghost bxs" onclick="closePitch()">✕</button></div>
+    <div class="sh-b" style="padding:16px 20px 20px;display:flex;flex-direction:column;gap:14px">
+      <div><label style="font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.05em;color:var(--sub);display:block;margin-bottom:6px">Startup name</label><input class="sinp" style="padding:12px 15px" placeholder="e.g. Finphi Technologies"/></div>
+      <div><label style="font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.05em;color:var(--sub);display:block;margin-bottom:6px">Sector</label><select class="sinp" style="padding:12px 15px;cursor:pointer"><option>FinTech</option><option>SaaS / B2B</option><option>D2C / Consumer</option><option>CleanTech</option><option>HealthTech</option><option>AgriTech</option><option>EdTech</option><option>Other</option></select></div>
+      <div><label style="font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.05em;color:var(--sub);display:block;margin-bottom:6px">Stage</label><select class="sinp" style="padding:12px 15px;cursor:pointer"><option>Idea / Pre-product</option><option>MVP / Early traction</option><option>Seed</option><option>Pre-Series A</option><option>Series A+</option></select></div>
+      <div><label style="font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.05em;color:var(--sub);display:block;margin-bottom:6px">Raise amount</label><input class="sinp" style="padding:12px 15px" placeholder="e.g. ₹2 Crore · SAFE"/></div>
+      <div><label style="font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.05em;color:var(--sub);display:block;margin-bottom:6px">One-liner</label><textarea class="sinp" style="resize:none;min-height:70px;line-height:1.5;padding:12px 15px" placeholder="What does your startup do in one sentence?"></textarea></div>
+      <div><label style="font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.05em;color:var(--sub);display:block;margin-bottom:6px">Pitch deck link (Google Drive / Notion)</label><input class="sinp" style="padding:12px 15px" placeholder="https://drive.google.com/…"/></div>
+      <button class="btn bg bfull" onclick="closePitch();showToast('Pitch submitted! Visible to 143 IIMK investors 🚀')">Submit pitch</button>
+    </div>
+  </div>
+</div>
+
+<!-- POST-CONNECT SHEET -->
+<div class="sov" id="pc-ov" onclick="closePc()">
+  <div class="sh" id="pc-sh" onclick="event.stopPropagation()" style="max-height:75%">
+    <div class="sh-hnd"></div>
+    <div style="padding:20px 20px 0;text-align:center">
+      <div style="font-size:36px;margin-bottom:10px">🎉</div>
+      <div style="font-family:Syne,sans-serif;font-size:20px;color:var(--ink);margin-bottom:4px">You're connected!</div>
+      <div style="font-size:13px;color:var(--mute);margin-bottom:20px" id="pc-sub">Connected with <strong id="pc-name">—</strong></div>
+      <!-- WA CALL -->
+      <a id="pc-wa-call" href="#" style="display:flex;align-items:center;gap:13px;background:#E7F9ED;border:1.5px solid #B2DFBC;border-radius:18px;padding:14px 16px;margin-bottom:10px;text-decoration:none;cursor:pointer" onclick="pcCall()">
+        <div style="width:44px;height:44px;border-radius:14px;background:#25D366;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2A19.79 19.79 0 0 1 11.19 18.85a19.5 19.5 0 0 1-6-6A19.79 19.79 0 0 1 2.12 4.18 2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+        </div>
+        <div style="flex:1;text-align:left">
+          <div style="font-size:14px;font-weight:700;color:#1B5E20">WhatsApp call</div>
+          <div style="font-size:11.5px;color:#388E3C;margin-top:1px">Opens WhatsApp with voice call</div>
+        </div>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#25D366" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+      </a>
+      <!-- WA MESSAGE -->
+      <a id="pc-wa-msg" href="#" style="display:flex;align-items:center;gap:13px;background:#E7F9ED;border:1.5px solid #B2DFBC;border-radius:18px;padding:14px 16px;margin-bottom:10px;text-decoration:none" onclick="pcMsg()">
+        <div style="width:44px;height:44px;border-radius:14px;background:#128C7E;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        </div>
+        <div style="flex:1;text-align:left">
+          <div style="font-size:14px;font-weight:700;color:#1B5E20">WhatsApp message</div>
+          <div style="font-size:11.5px;color:#388E3C;margin-top:1px" id="pc-wa-preview">Opens chat with intro message</div>
+        </div>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#128C7E" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+      </a>
+      <!-- LINKEDIN -->
+      <div id="pc-li-btn" style="display:flex;align-items:center;gap:13px;background:#EBF3FB;border:1.5px solid #BFDBF0;border-radius:18px;padding:14px 16px;margin-bottom:10px;cursor:pointer" onclick="pcLI()">
+        <div style="width:44px;height:44px;border-radius:14px;background:#0A66C2;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="#fff"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>
+        </div>
+        <div style="flex:1;text-align:left">
+          <div style="font-size:14px;font-weight:700;color:#0A66C2">Connect on LinkedIn</div>
+          <div style="font-size:11.5px;color:#4A7FA0;margin-top:1px" id="pc-li-url">Opens their LinkedIn profile</div>
+        </div>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#0A66C2" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+      </div>
+      <button class="btn bo bfull" onclick="closePc()" style="margin-bottom:20px">Done</button>
+    </div>
+  </div>
+</div>
+
+<!-- CONNECT SHEET -->
+<div class="sov" id="cx-ov" onclick="closeCx()">
+  <div class="sh" id="cx-sh" onclick="event.stopPropagation()">
+    <div class="sh-hnd"></div>
+    <div style="padding:16px 20px 0">
+      <div style="display:flex;align-items:center;gap:13px;margin-bottom:16px">
+        <div class="av" id="cx-av" style="width:52px;height:52px;font-size:16px;font-family:Syne,sans-serif"></div>
+        <div><div style="font-family:Syne,sans-serif;font-size:16px;color:var(--ink)" id="cx-name">—</div><div style="font-size:12.5px;color:var(--mute);margin-top:2px" id="cx-role">—</div></div>
+      </div>
+      <!-- LinkedIn prominent CTA -->
+      <div id="cx-li-block" style="background:#EBF3FB;border:1.5px solid #BFDBF0;border-radius:18px;padding:14px 16px;margin-bottom:14px;cursor:pointer;display:flex;align-items:center;gap:12px">
+        <div style="width:40px;height:40px;border-radius:12px;background:#0A66C2;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="#fff"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>
+        </div>
+        <div style="flex:1">
+          <div style="font-size:14px;font-weight:700;color:#0A66C2">Connect on LinkedIn</div>
+          <div style="font-size:11.5px;color:#4A7FA0;margin-top:2px" id="cx-li-url">Opens LinkedIn profile</div>
+        </div>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#0A66C2" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+      </div>
+      <!-- Divider -->
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">
+        <div style="flex:1;height:1px;background:var(--border)"></div>
+        <div style="font-size:11px;color:var(--mute);font-weight:600">OR SEND A NOTE VIA K·NETWORK</div>
+        <div style="flex:1;height:1px;background:var(--border)"></div>
+      </div>
+      <div style="font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.05em;color:var(--sub);margin-bottom:7px">Your note</div>
+      <textarea id="cx-msg" style="width:100%;padding:13px 15px;border-radius:16px;border:1.5px solid var(--border);background:var(--bg);font-size:14px;color:var(--ink);font-family:DM Sans,sans-serif;outline:none;resize:none;min-height:100px;line-height:1.6;display:block;margin-bottom:14px"></textarea>
+      <button class="btn bg bfull" onclick="sendCx()" style="margin-bottom:20px">Send connection request</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="tst"></div>
+</div>
+
+<script>
+// ═══ DATA ═══
+const ALUMNI=[
+  {n:"Priya Menon",i:"PM",b:2019,r:"VP Strategy",c:"Deloitte",l:"Mumbai",tags:["Strategy","Consulting"],av:"apu",lk:true,open:true,type:"exec",li:"https://www.linkedin.com/in/priya-menon-iimk"},
+  {n:"Rahul Nair",i:"RN",b:2016,r:"Co-founder & CEO",c:"Finphi Technologies",l:"Bangalore",tags:["FinTech","SaaS","Startups"],av:"aor",lk:true,open:true,type:"founder",li:"https://www.linkedin.com/in/rahul-nair-finphi"},
+  {n:"Anjali Sharma",i:"AS",b:2022,r:"Product Manager",c:"Google",l:"Hyderabad",tags:["Product","AI/ML"],av:"apu",lk:false,open:false,type:"exec",li:""},
+  {n:"Karthik Iyer",i:"KI",b:2010,r:"MD — India",c:"Goldman Sachs",l:"Mumbai",tags:["Finance","PE/VC"],av:"aam",lk:true,open:false,type:"investor",li:"https://www.linkedin.com/in/karthik-iyer-gs"},
+  {n:"Deepa V",i:"DV",b:2013,r:"Chief Marketing Officer",c:"Swiggy",l:"Bangalore",tags:["Marketing","D2C"],av:"api",lk:true,open:true,type:"exec",li:"https://www.linkedin.com/in/deepa-v-swiggy"},
+  {n:"Suresh B",i:"SB",b:2007,r:"Partner",c:"Sequoia Capital India",l:"Bangalore",tags:["VC","Investments","Startups"],av:"ate",lk:true,open:true,type:"investor",li:"https://www.linkedin.com/in/suresh-b-sequoia"},
+  {n:"Meera R",i:"MR",b:2024,r:"Analyst",c:"McKinsey",l:"Delhi",tags:["Consulting"],av:"apu",lk:false,open:true,type:"exec",li:""},
+  {n:"Aditya P",i:"AP",b:2019,r:"SDE-III",c:"Microsoft",l:"Hyderabad",tags:["Tech","AI/ML"],av:"apu",lk:true,open:false,type:"exec",li:"https://www.linkedin.com/in/aditya-p-msft"},
+  {n:"Lakshmi N",i:"LN",b:2016,r:"AVP Risk",c:"ICICI Bank",l:"Chennai",tags:["Banking","FinTech"],av:"aam",lk:true,open:true,type:"exec",li:"https://www.linkedin.com/in/lakshmi-n-icici"},
+  {n:"Rohit G",i:"RG",b:2013,r:"Director Sales",c:"Salesforce",l:"Mumbai",tags:["SaaS","Sales"],av:"aor",lk:true,open:true,type:"exec",li:"https://www.linkedin.com/in/rohit-g-salesforce"},
+  {n:"Sunita P",i:"SP",b:2010,r:"Founder",c:"GreenMile EV",l:"Pune",tags:["EV","CleanTech"],av:"ate",lk:true,open:true,type:"founder",li:"https://www.linkedin.com/in/sunita-p-greenmile"},
+  {n:"Vijay K",i:"VK",b:2007,r:"CEO",c:"HealthKart",l:"Delhi",tags:["D2C","Healthcare"],av:"api",lk:true,open:false,type:"exec",li:"https://www.linkedin.com/in/vijay-k-healthkart"},
+  {n:"Nisha T",i:"NT",b:2019,r:"Head of Growth",c:"CRED",l:"Bangalore",tags:["FinTech","Growth"],av:"api",lk:true,open:true,type:"exec",li:"https://www.linkedin.com/in/nisha-t-cred"},
+  {n:"Prasad K",i:"PK",b:2013,r:"Founder & CTO",c:"DataWeave",l:"Bangalore",tags:["AI/ML","SaaS"],av:"apu",lk:true,open:true,type:"founder",li:"https://www.linkedin.com/in/prasad-k-dataweave"},
+  {n:"Ravan Kulkarni",i:"RK",b:2016,r:"Country Manager",c:"Directa24",l:"Hyderabad",tags:["FinTech","SaaS","AI/ML"],av:"agrd",lk:true,open:true,type:"exec",li:"https://www.linkedin.com/in/rohan-raj-kulkarni"},
+];
+// Alias with normalised field names used by newer features
+const ALUMNI_DATA=ALUMNI.map(a=>({...a,id:a.i,full_name:a.n,initials:a.i,batch_year:a.b,current_title:a.r,current_company:a.c,city:a.l,li:a.li||"",open:a.open||false}));
+
+const MENTORS=[
+  {n:"Karthik Iyer",i:"KI",b:2010,r:"MD India, Goldman Sachs",av:"aam",expertise:["Finance","PE/VC","IB"],slots:2,mode:"1:1 monthly",track:"finance",bio:"15+ yrs in investment banking. Mentored 12 IIMKians into top finance roles globally."},
+  {n:"Deepa V",i:"DV",b:2013,r:"CMO, Swiggy",av:"api",expertise:["Marketing","Brand","D2C"],slots:3,mode:"Group fortnightly",track:"career",bio:"Built Swiggy\'s brand from 0 to ₹10,000Cr revenue. Passionate about brand storytelling."},
+  {n:"Suresh B",i:"SB",b:2007,r:"Partner, Sequoia Capital",av:"ate",expertise:["Startup","VC","Fundraising"],slots:1,mode:"1:1 bi-monthly",track:"startup",bio:"Invested in 40+ startups. Helping founders navigate seed to Series A."},
+  {n:"Rahul Nair",i:"RN",b:2016,r:"Co-founder CEO, Finphi",av:"aor",expertise:["Startups","FinTech","SaaS"],slots:2,mode:"1:1 monthly",track:"startup",bio:"Built Finphi from 0 to ₹30L ARR in 14 months. Ex-Razorpay PM."},
+  {n:"Priya Menon",i:"PM",b:2019,r:"VP Strategy, Deloitte",av:"apu",expertise:["Strategy","Consulting","MBA prep"],slots:4,mode:"1:1 fortnightly",track:"mba",bio:"IIMK '19 · Stanford MBA · Helps junior alumni crack top MBA programs."},
+  {n:"Anjali Sharma",i:"AS",b:2022,r:"PM, Google",av:"apu",expertise:["Product","Tech","AI/ML"],slots:3,mode:"Group monthly",track:"career",bio:"Ex-FAANG PM. Mentors on product management, tech careers, and AI."},
+];
+const STARTUPS=[
+  {name:"Finphi Technologies",co:"RN",cav:"aor",sector:"FinTech",stage:"Seed",ask:"₹2Cr",askN:20000000,metric1:{n:"₹30L",l:"ARR"},metric2:{n:"3x",l:"YoY"},metric3:{n:"140",l:"Clients"},desc:"B2B FinTech SaaS — automated reconciliation for NBFCs and cooperative banks. 14 months to ₹30L ARR.",intros:3,views:48,filter:"fintech"},
+  {name:"GreenMile EV",co:"SP",cav:"ate",sector:"CleanTech",stage:"Series A",ask:"₹8Cr",askN:80000000,metric1:{n:"450+",l:"Stations"},metric2:{n:"8",l:"Cities"},metric3:{n:"12K",l:"Monthly users"},desc:"EV charging infrastructure across Tier-1 and Tier-2 cities. Partnered with HPCL and 3 state govts.",intros:6,views:92,filter:"cleantech"},
+  {name:"DataWeave",co:"PK",cav:"apu",sector:"SaaS / AI",stage:"Pre-Series A",ask:"₹5Cr",askN:50000000,metric1:{n:"₹1.2Cr",l:"ARR"},metric2:{n:"22",l:"Clients"},metric3:{n:"89%",l:"Retention"},desc:"AI-powered competitive intelligence for e-commerce brands. Real-time pricing and assortment analytics.",intros:2,views:37,filter:"saas"},
+  {name:"NutriSense AI",co:"MR",cav:"apu",sector:"HealthTech",stage:"Seed",ask:"₹3Cr",askN:30000000,metric1:{n:"18K",l:"Users"},metric2:{n:"4.7★",l:"Rating"},metric3:{n:"₹8L",l:"MRR"},desc:"AI-powered personalized nutrition for diabetics. Integrates CGM data with meal and lifestyle logs.",intros:4,views:61,filter:"health"},
+  {name:"AgriLink",co:"VK",cav:"api",sector:"AgriTech",stage:"MVP",ask:"₹1Cr",askN:10000000,metric1:{n:"200",l:"Farmers"},metric2:{n:"4",l:"Districts"},metric3:{n:"22%",l:"Yield gain"},desc:"Direct market linkage platform connecting 200 farmers to institutional buyers. Piloted in Telangana.",intros:1,views:29,filter:"saas"},
+  {name:"HealthKart B2B",co:"VK",cav:"api",sector:"D2C / Health",stage:"Pre-Series A",ask:"₹10Cr",askN:100000000,metric1:{n:"₹6Cr",l:"ARR"},metric2:{n:"350",l:"Clinics"},metric3:{n:"2.1x",l:"MOIC est."},desc:"B2B arm of HealthKart — supplying nutraceuticals to clinics and hospital chains at scale.",intros:8,views:114,filter:"d2c"},
+];
+const EVENTS=[
+  {title:"Hyd Chapter Mixer Q1 2026",chapter:"Hyderabad",type:"Mixer",date:"Jan 18, 2026",time:"7:00 PM",venue:"ITC Kohinoor, Hyderabad",desc:"Q1 2026 Hyderabad chapter mixer. 64 alumni attended across 12 batch years.",attending:64,cap:80,price:0,color:["#FF5C35","#5B3CF5"],filter:"hyd",tags:["Mixer","Networking"],past:true,youAttended:true,attendees:["PM","RN","KI","DV","SB","NT","PK","LN"]},
+  {title:"IIMK Hyderabad Chapter Mixer",chapter:"Hyderabad",type:"Mixer",date:"Apr 19, 2026",time:"7:00 PM",venue:"JW Marriott, Jubilee Hills",desc:"Quarterly alumni mixer for Hyderabad chapter — 80+ RSVPs. Drinks, dinner, and deal flow.",attending:82,cap:120,price:0,color:["#FF5C35","#5B3CF5"],emoji:"🥂",filter:"hyd",tags:["Mixer","Networking"]},
+  {title:"IIMK Startup Summit 2026",chapter:"Bengaluru",type:"Summit",date:"May 3, 2026",time:"10:00 AM",venue:"The Leela, Bengaluru",desc:"Annual startup pitch event. 12 founders pitching to 30+ IIMK investors. Keynote by Suresh B (Sequoia).",attending:210,cap:250,price:999,color:["#5B3CF5","#E040FB"],emoji:"🚀",filter:"blr",tags:["Summit","Startup","VC"]},
+  {title:"IIMK Dubai Chapter Dinner",chapter:"Dubai",type:"Dinner",date:"May 10, 2026",time:"8:00 PM",venue:"Atlantis The Palm",desc:"Annual GCC alumni gathering. 50+ attendees from UAE, Saudi, Qatar. Black tie optional.",attending:47,cap:80,price:5000,color:["#F59E0B","#EF4444"],emoji:"🌙",filter:"dxb",tags:["Dinner","GCC"]},
+  {title:"FinTech Founders Roundtable",chapter:"Online",type:"Webinar",date:"Apr 26, 2026",time:"5:00 PM IST",venue:"Zoom (link post-RSVP)",desc:"Closed-door roundtable for FinTech founders and investors from the IIMK community. 20 seat limit.",attending:14,cap:20,price:0,color:["#00BF6F","#0EA5E9"],emoji:"💸",filter:"online",tags:["FinTech","Founders"]},
+  {title:"IIMK US East Coast Meetup",chapter:"New York",type:"Mixer",date:"May 18, 2026",time:"6:30 PM",venue:"The Yale Club, NYC",desc:"North America east coast alumni meetup — 60+ IIMK alumni across NY, NJ, CT. Annual tradition.",attending:53,cap:75,price:2500,color:["#5B3CF5","#00BF6F"],emoji:"🗽",filter:"us",tags:["Mixer","USA"]},
+  {title:"IIMK Mumbai Board Conclave",chapter:"Mumbai",type:"Conference",date:"Jun 7, 2026",time:"9:00 AM",venue:"Four Seasons, Worli",desc:"Invitation-only conclave for alumni in CXO and Board roles. Policy roundtable on Indian manufacturing.",attending:38,cap:50,price:0,color:["#FF5C35","#F59E0B"],emoji:"🏛",filter:"mum",tags:["CXO","Policy"]},
+];
+const JOBS=[
+  {title:"VP Product — Payments",co:"Razorpay",loc:"Bengaluru",type:"Full-time",level:"VP",tags:["Product","FinTech"],referrer:"Nisha T",refav:"api",refbatch:"'19",desc:"Lead product for Razorpay\'s SME banking vertical. 12+ years experience. CTC: ₹80–100L.",posted:"2h ago",filter:"product"},
+  {title:"Country Manager — India",co:"Stripe",loc:"Mumbai",type:"Full-time",level:"C-Suite",tags:["Payments","P&L"],referrer:"Karthik Iyer",refav:"aam",refbatch:"'10",desc:"GM role running Stripe India — P&L ownership, team of 120+. Market-leading CTC + ESOP.",posted:"1d ago",filter:"exec"},
+  {title:"CFO",co:"Finphi Technologies",loc:"Bengaluru",type:"Full-time",level:"C-Suite",tags:["Finance","Startup"],referrer:"Rahul Nair",refav:"aor",refbatch:"'16",desc:"IIMK founder-led FinTech SaaS. ₹30L ARR. Looking for finance leader to own fundraise and compliance.",posted:"3d ago",filter:"finance"},
+  {title:"Engineering Manager — AI/ML",co:"Microsoft India",loc:"Hyderabad",type:"Full-time",level:"Manager",tags:["Tech","AI/ML"],referrer:"Aditya P",refav:"apu",refbatch:"'19",desc:"Lead a team of 12 engineers building AI features for Microsoft 365. Hybrid, Hyderabad.",posted:"4d ago",filter:"tech"},
+  {title:"Head of Sales — Enterprise",co:"Salesforce",loc:"Mumbai",type:"Full-time",level:"Director",tags:["SaaS","Sales"],referrer:"Rohit G",refav:"aor",refbatch:"'13",desc:"Lead enterprise sales for West India. 10+ years B2B SaaS sales background. 150% OTE.",posted:"5d ago",filter:"sales"},
+  {title:"Strategy Director",co:"McKinsey & Co",loc:"Delhi",type:"Full-time",level:"Director",tags:["Consulting","Strategy"],referrer:"Meera R",refav:"apu",refbatch:"'24",desc:"Senior strategy hire for McKinsey India practice. 8–12 years consulting experience.",posted:"1w ago",filter:"exec"},
+];
+const SYN=[
+  {t:"HealthKart Pre-IPO Block",s:"D2C / Healthcare",raised:2800000,target:5000000,inv:[{i:"KI",a:"aam"},{i:"RN",a:"aor"},{i:"SB",a:"ate"},{i:"DV",a:"api"}],min:500000,close:"Apr 30",sc:"tpu",ret:"Est. 1.8–2.2x (12mo)"},
+  {t:"Finphi Technologies Seed",s:"FinTech SaaS",raised:900000,target:2000000,inv:[{i:"PM",a:"apu"},{i:"SB",a:"ate"},{i:"VK",a:"api"}],min:100000,close:"May 15",sc:"tgr",ret:"Target 5–8x (5yr)"},
+  {t:"GreenMile EV Series A",s:"EV / CleanTech",raised:1500000,target:3000000,inv:[{i:"KI",a:"aam"},{i:"SB",a:"ate"},{i:"AP",a:"apu"},{i:"LN",a:"aam"},{i:"RG",a:"aor"}],min:200000,close:"May 20",sc:"tor",ret:"Target 3–5x (4yr)"},
+];
+const KMP=[
+  {n:"Suresh B",i:"SB",b:2007,r:"Partner, Sequoia Capital India",av:"ate",tags:["VC","FinTech","Startups"],pct:94,common:"FinTech, Startups",type:"investor"},
+  {n:"Rahul Nair",i:"RN",b:2016,r:"Co-founder & CEO, Finphi",av:"aor",tags:["FinTech","SaaS"],pct:89,common:"FinTech, SaaS",type:"founder"},
+  {n:"Anjali Sharma",i:"AS",b:2022,r:"Product Manager, Google",av:"apu",tags:["Product","AI/ML"],pct:82,common:"SaaS, AI",type:"exec"},
+  {n:"Nisha T",i:"NT",b:2019,r:"Head of Growth, CRED",av:"api",tags:["FinTech","Growth"],pct:78,common:"FinTech",type:"exec"},
+  {n:"Prasad K",i:"PK",b:2013,r:"Founder & CTO, DataWeave",av:"apu",tags:["AI/ML","SaaS"],pct:75,common:"SaaS, Startups",type:"founder"},
+];
+const NOTIFS=[
+  {txt:"Suresh B (Sequoia) wants to connect · 94% K-Match score",ts:"2h ago",u:true,icon:"💝",bg:"#FDF2F8"},
+  {txt:"Vikram K posted VP Product at Razorpay — matches FinTech Founders",ts:"4h ago",u:true,icon:"💼",bg:"#FFF0EB"},
+  {txt:"IIMK Startup Summit 2026 — 68 seats left, closes May 3",ts:"Yesterday",u:true,icon:"🚀",bg:"#EDEDFF"},
+  {txt:"New Syndicate: HealthKart Pre-IPO · Closes Apr 30 · Min ₹5L",ts:"Yesterday",u:true,icon:"💸",bg:"#FFF0EB"},
+  {txt:"Karthik Iyer approved your mentorship application",ts:"Apr 2",u:false,icon:"🎓",bg:"#ECFDF5"},
+  {txt:"LinkedIn Proxycurl sync complete — 23 profiles refreshed",ts:"Apr 1",u:false,icon:"🔗",bg:"#ECFDF5"},
+];
+const CHATS=[
+  {id:1,name:"Suresh B",av:"ate",i:"SB",last:"Looking forward to connecting!",time:"2h",unread:2,online:true},
+  {id:2,name:"FinTech Founders",av:"agrd",i:"FF",last:"Anyone attending the Summit?",time:"5h",unread:1,online:false,group:true},
+  {id:3,name:"Deepa V",av:"api",i:"DV",last:"Sure, let's schedule a call",time:"1d",unread:0,online:false},
+  {id:4,name:"IIMK Batch '16",av:"agr2",i:"16",last:"Reunion: June 14 in Kozhikode!",time:"2d",unread:1,online:false,group:true},
+  {id:5,name:"Rahul Nair",av:"aor",i:"RN",last:"Sent you the deck",time:"3d",unread:0,online:true},
+];
+const FEED=[
+  {type:"achievement",author:"K·Network",arole:"Milestone alert · Auto-detected",ai:"KN",aav:"agrd",time:"Just now",body:"🎉 <strong>Rahul Nair</strong> (Batch '16) just crossed <strong>₹30L ARR</strong> at Finphi Technologies — in just 14 months! Congratulate him.",likes:62,comments:8,tags:["milestone","fintech"],achievement:true,achiever:"RN",achieverav:"aor"},
+  {type:"startup",author:"Rahul Nair",arole:"Co-founder · Finphi",ai:"RN",aav:"aor",time:"2h ago",body:"Excited to share: <strong>Finphi crossed ₹30L ARR</strong> in Month 14! 🚀 From a hostel room idea to 140 NBFC clients — couldn't have done it without the IIMK network. If you're in FinTech, let's connect.",likes:47,comments:18,tags:["startup","fintech"]},
+  {type:"job",author:"Nisha T",arole:"Head of Growth · CRED",ai:"NT",aav:"api",time:"4h ago",body:"<strong>We're hiring at CRED!</strong> Looking for a Senior Growth Manager — B2C, data-first, Bengaluru. If you know anyone sharp from the IIMK community, ping me. Referral bonus ₹50K. JD in comments.",likes:34,comments:22,tags:["job","cred","growth"]},
+  {type:"insight",author:"Karthik Iyer",arole:"MD · Goldman Sachs",ai:"KI",aav:"aam",time:"1d ago",body:"Spent last week in meetings across Hyderabad, Pune, and Bengaluru. Observation: <strong>Indian Series B valuations have corrected 35–40% from 2021 peaks</strong> — but deal quality is genuinely stronger. Founders are capital efficient. Good time to be writing cheques.",likes:89,comments:41,tags:["insight","vc","india"]},
+  {type:"event",author:"IIMK Alumni Assoc.",arole:"Official chapter · Hyderabad",ai:"IK",aav:"agrd",time:"2d ago",body:"<strong>Hyderabad Chapter Mixer — Apr 19! 🥂</strong> JW Marriott, Jubilee Hills · 7 PM onwards. 82 RSVPs already — seats filling fast. This will be our biggest Hyd chapter event yet. RSVP via Events tab.",likes:56,comments:29,tags:["event","hyderabad"]},
+];
+const TC={FinTech:"tor",SaaS:"tpu",Startups:"tor",VC:"tor",Investments:"tor","AI/ML":"tpu",Product:"tpu",Consulting:"tgry",Strategy:"tgry",Finance:"tam","PE/VC":"tam",Marketing:"tpi",D2C:"tpi",Brand:"tpi",EV:"tgr",CleanTech:"tgr",ESG:"tgr",Healthcare:"tgr",Banking:"tam",Tech:"tpu",Technology:"tpu",Sales:"tor",EdTech:"tpu",Data:"tpu",Growth:"tor",MedTech:"tgr",B2B:"tpu",Payments:"tor",startup:"tor",job:"tpu",event:"tgr",insight:"tam",fintech:"tor",saas:"tpu",vc:"tam",india:"tgry",cred:"tpu",Mixer:"tgr",Summit:"tpu",Dinner:"tam",Webinar:"tbl",Conference:"tpu",USA:"tbl",GCC:"tam",CXO:"tgry",Policy:"tgry",Networking:"tgr",Founders:"tor",FinTech_ev:"tor"};
+const tc=t=>`<span class="tag ${TC[t]||"tgry"}">${t}</span>`;
+const fmt=n=>"₹"+(n>=10000000?(n/10000000).toFixed(1)+"Cr":n>=100000?(n/100000).toFixed(1)+"L":n.toLocaleString());
+const synColors={tpu:"linear-gradient(90deg,#5B3CF5,#A78BFA)",tgr:"linear-gradient(90deg,#059669,#4ADE80)",tor:"linear-gradient(90deg,#FF5C35,#FB923C)"};
+const fiColors={FinTech:"linear-gradient(90deg,#FF5C35,#5B3CF5)","FinTech":"linear-gradient(90deg,#FF5C35,#5B3CF5)","SaaS / AI":"linear-gradient(90deg,#5B3CF5,#E040FB)","CleanTech":"linear-gradient(90deg,#00BF6F,#0EA5E9)","D2C / Health":"linear-gradient(90deg,#F59E0B,#EF4444)","HealthTech":"linear-gradient(90deg,#00BF6F,#5B3CF5)","AgriTech":"linear-gradient(90deg,#059669,#F59E0B)"};
+let cYr="all",cFF="all",cKmf="all",cKi=0,cMF="all",cFI="all",cEV="all",cJobs="all",cCid=1,prevTab="feed";
+
+// SCREEN MAP
+const SM={feed:"s-feed",net:"s-net",dir:"s-dir",km:"s-km",mentor:"s-mentor",groups:"s-groups",ventures:"s-ventures",fi:"s-fi",syn:"s-syn",collab:"s-collab",companies:"s-companies",reunion:"s-reunion",leaderboard:"s-leaderboard",events:"s-events",me:"s-me",profile:"s-profile",jobs:"s-jobs",chat:"s-chat",cv:"s-cv"};
+const TM={feed:"t-feed",net:"t-net",ventures:"t-ventures",events:"t-events",me:"t-me"};
+const tabKeys=new Set(["feed","net","ventures","events","me"]);
+const hideFab=new Set(["chat","cv","km","dir","groups","mentor","profile","me","jobs"]);
+const hideTabFor=new Set(["cv"]);
+
+function go(id){
+  document.querySelectorAll(".scr").forEach(s=>s.classList.remove("on"));
+  document.getElementById(SM[id])?.classList.add("on");
+  if(tabKeys.has(id)){
+    document.querySelectorAll(".tab").forEach(t=>t.classList.remove("on"));
+    document.getElementById(TM[id])?.classList.add("on");
+  }
+  const fab=document.getElementById("fab");
+  fab.classList.toggle("hide",hideFab.has(id));
+  const tabbar=document.querySelector(".tabbar");
+  tabbar.style.display=hideTabFor.has(id)?"none":"flex";
+  if(id==="dir")renderAl();
+  if(id==="km")renderKM();
+  if(id==="mentor")renderMentors();
+  if(id==="groups")renderGroups();
+  if(id==="profile"){renderProfileEvents();}
+  if(id==="fi")renderFI();
+  if(id==="syn"){renderSyn();setTimeout(animProg,160);}
+  if(id==="collab")renderCollab();
+  if(id==="companies")renderCompanies();
+  if(id==="reunion")renderReunion();
+  if(id==="leaderboard")renderLeaderboard();
+  if(id==="events")renderEvents();
+  if(id==="jobs")renderJobs();
+  if(id==="chat"){renderCL();}
+  if(id==="ventures")renderVenturesPreview();
+  if(id==="net")renderSuggested();
+  if(id==="feed")renderFeed();
+}
+
+function prevScreen(){
+  document.querySelector(".tabbar").style.display="flex";
+  go(prevTab||"feed");
+}
+function openChat(id){prevTab=currentTab();cCid=id;const c=CHATS.find(x=>x.id===id)||CHATS[0];document.querySelectorAll(".scr").forEach(s=>s.classList.remove("on"));document.getElementById("s-cv").classList.add("on");document.querySelector(".tabbar").style.display="none";document.getElementById("fab").classList.add("hide");const av=document.getElementById("cv-av");av.className="av "+c.av;av.textContent=c.i;av.style.cssText="width:38px;height:38px;font-size:12px;flex-shrink:0;font-family:Syne,sans-serif";document.getElementById("cv-name").textContent=c.name;document.getElementById("cv-st").textContent=c.online?"Online now":"Last seen recently";document.getElementById("cv-st").style.color=c.online?"#34C759":"var(--mute)";loadMsgs(id);}
+function currentTab(){const t=document.querySelector(".tab.on");return t?t.id.replace("t-",""):"feed";}
+
+// FEED
+function renderFeed(){
+  const list=document.getElementById("feed-list");
+  const data=cFF==="all"?FEED:FEED.filter(p=>p.type===cFF);
+  list.innerHTML=data.map(p=>`
+    <div class="feed-post">
+      <div class="fp-top"><div class="av ${p.aav}" style="width:40px;height:40px;font-size:12px;font-family:Syne,sans-serif;flex-shrink:0">${p.ai}</div><div class="fp-author"><div class="fp-name">${p.author}</div><div class="fp-role">${p.arole}</div></div><div class="fp-time">${p.time}</div></div>
+      <div class="fp-body">${p.body}</div>
+      <div class="fp-tag-row">${p.tags.map(tc).join("")}</div>
+      <div class="fp-actions">
+        <div class="fp-act" onclick="this.style.color='var(--pu)';showToast('Liked!')"><svg viewBox="0 0 24 24"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3H14z"/><path d="M7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"/></svg>${p.likes}</div>
+        <div class="fp-act" onclick="showToast('Comments coming soon!')"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>${p.comments}</div>
+        <div class="fp-act" onclick="showToast('Shared with your network!')"><svg viewBox="0 0 24 24"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>Share</div>
+      </div>
+      ${p.achievement?`<div style="background:#ECFDF5;border-top:1px solid rgba(5,150,105,.12);padding:8px 14px;font-size:11.5px;color:#059669;display:flex;align-items:center;gap:6px"><span>✨</span>Milestone auto-detected via LinkedIn · <span onclick="showToast('Congratulation sent to Rahul!')" style="font-weight:700;cursor:pointer;text-decoration:underline">Send congrats</span></div>`:""}
+      <div style="padding:5px 14px 6px;font-size:10.5px;color:var(--dim);display:flex;align-items:center;gap:4px">
+        <span style="width:6px;height:6px;border-radius:50%;background:#059669;display:inline-block"></span>AI moderation: <span style="color:var(--mute);font-weight:600">Reviewed · Safe</span>
+      </div>
+    </div>`).join("");
+}
+function setFF(el,f){cFF=f;document.querySelectorAll("#feed-chips .chip").forEach(c=>c.classList.remove("on"));el.classList.add("on");renderFeed();}
+function renderStories(){
+  const data=[{n:"Suresh B",i:"SB",av:"ate",seen:false},{n:"Rahul N",i:"RN",av:"aor",seen:false},{n:"Deepa V",i:"DV",av:"api",seen:true},{n:"Nisha T",i:"NT",av:"api",seen:false},{n:"Karthik",i:"KI",av:"aam",seen:true}];
+  document.getElementById("story-bar").innerHTML=`<div class="story-item" onclick="showToast('Add your story!')"><div class="story-ring" style="background:var(--dim)"><div class="story-av" style="background:var(--g1);color:#fff;font-size:20px;font-family:Syne,sans-serif">+</div></div><div class="story-name">Your story</div></div>`+data.map(s=>`<div class="story-item" onclick="showToast('${s.n} story')"><div class="story-ring ${s.seen?"seen":""}"><div class="av ${s.av} story-av" style="font-size:14px;font-family:Syne,sans-serif">${s.i}</div></div><div class="story-name">${s.n}</div></div>`).join("");
+}
+
+// DIRECTORY
+function renderAl(){
+  const q=(document.getElementById("alq")||{}).value||"";
+  let list=ALUMNI;if(cYr!=="all")list=list.filter(a=>a.b===parseInt(cYr));
+  if(q){const ql=q.toLowerCase();list=list.filter(a=>a.n.toLowerCase().includes(ql)||a.r.toLowerCase().includes(ql)||a.c.toLowerCase().includes(ql)||a.l.toLowerCase().includes(ql));}
+  document.getElementById("al-list").innerHTML=list.length?list.map((a,i)=>`
+    <div class="al-card" style="${i===list.length-1?"border-bottom:none":""}">
+      <div class="av ${a.av}" style="width:50px;height:50px;font-size:14px;font-family:Syne,sans-serif">${a.i}</div>
+      <div class="al-info">
+        <div style="display:flex;align-items:center;gap:7px"><div class="al-name">${a.n}</div><span class="tag tgry" style="font-size:9px;padding:2px 7px">'${String(a.b).slice(2)}</span></div>
+        <div class="al-role">${a.r} · ${a.c}</div>
+        <div class="al-loc">📍 ${a.l} ${a.lk?"  · <span style=\'color:#059669;font-weight:700;font-size:11px\'>● LinkedIn</span>":""}</div>
+        <div class="al-tags-row">${a.tags.slice(0,3).map(tc).join("")}${a.open?tc("Open to connect"):""}</div>
+        <div class="al-btns-row"><button class="btn bg bsm" onclick="openCx('${a.n}','${a.r} · ${a.c}','${a.av}','${a.i}','${a.li||""}')">Connect</button>${a.li?`<button class="btn bsm" style="background:#EBF3FB;color:#0A66C2;border:1.5px solid #BFDBF0;display:flex;align-items:center;gap:4px" onclick="openLI('${a.li}')"><svg width='12' height='12' viewBox='0 0 24 24' fill='#0A66C2'><path d='M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z'/><rect x='2' y='9' width='4' height='12'/><circle cx='4' cy='4' r='2'/></svg>LinkedIn</button>`:""}</div>
+      </div>
+    </div>`).join(""):`<div style="text-align:center;padding:50px;color:var(--mute)"><div style="font-size:44px;margin-bottom:10px">🔍</div>No alumni found</div>`;
+}
+function setYr(el,y){cYr=y;document.querySelectorAll("#yr-chips .chip").forEach(c=>c.classList.remove("on"));el.classList.add("on");renderAl();}
+function renderSuggested(){
+  const data=ALUMNI.filter(a=>a.open).slice(0,4);
+  document.getElementById("suggested-list").innerHTML=data.map(a=>`
+    <div class="card" style="display:flex;align-items:center;gap:12px;padding:13px 15px">
+      <div class="av ${a.av}" style="width:44px;height:44px;font-size:13px;font-family:Syne,sans-serif">${a.i}</div>
+      <div style="flex:1;min-width:0"><div style="font-size:14px;font-weight:700;color:var(--ink)">${a.n}</div><div style="font-size:12px;color:var(--mute);margin-top:1px">${a.r} · ${a.c}</div><div style="display:flex;gap:5px;margin-top:6px">${a.tags.slice(0,2).map(tc).join("")}</div></div>
+      <button class="btn bg bsm" onclick="showToast('Connected with ${a.n}!')">Connect</button>
+    </div>`).join("");
+}
+
+// GROUPS
+const joined={};
+function renderGroups(){
+  const G=[{color:"#FF5C35",t:"FinTech Founders",m:234,d:"Founders in financial technology",tags:["FinTech","Startups"],joined:true},{color:"#5B3CF5",t:"AI & ML Circle",m:189,d:"Applied AI in business",tags:["AI/ML","LLMs"],joined:false},{color:"#00BF6F",t:"CleanTech India",m:97,d:"Sustainability and green energy",tags:["EV","CleanTech"],joined:false},{color:"#F59E0B",t:"PE/VC Network",m:143,d:"Venture capital and investing",tags:["PE/VC","Angel"],joined:true},{color:"#E040FB",t:"D2C & Brand Builders",m:76,d:"Consumer brands and marketing",tags:["D2C","Brand"],joined:false},{color:"#0EA5E9",t:"SaaS & Product",m:201,d:"Building global SaaS products",tags:["SaaS","Product"],joined:true},{color:"#059669",t:"Healthcare Innovators",m:62,d:"Healthcare and medtech",tags:["Healthcare","MedTech"],joined:false},{color:"#6366F1",t:"EdTech & Learning",m:54,d:"Education technology",tags:["EdTech","Skills"],joined:false}];
+  G.forEach(g=>{if(g.joined&&!(g.t in joined))joined[g.t]=true;});
+  document.getElementById("grp-list").innerHTML=G.map((g,i)=>`
+    <div class="cardf"><div style="display:flex;align-items:flex-start;gap:0px;padding:14px 16px 10px"><div style="flex:1"><div style="font-family:Syne,sans-serif;font-size:15px;color:var(--ink);margin-bottom:2px">${g.t}</div><div style="font-size:12.5px;color:var(--sub)">${g.d}</div></div></div>
+    <div style="display:flex;gap:6px;flex-wrap:wrap;padding:0 16px 10px">${g.tags.map(tc).join("")}</div>
+    <div style="padding:11px 16px;border-top:1px solid rgba(91,60,245,.07);display:flex;align-items:center;justify-content:space-between"><div style="font-size:12.5px;color:var(--mute)">${g.m.toLocaleString()} members</div><button class="btn bsm ${joined[g.t]?"bghost":"bg"}" id="gb${i}" onclick="togGrp('${g.t}',${i})">${joined[g.t]?"✓ Joined":"Join"}</button></div>
+    <div style="background:#ECFDF5;border-top:1px solid rgba(5,150,105,.12);padding:9px 16px;font-size:12px;color:#059669;font-weight:700;display:${joined[g.t]?"flex":"none"};align-items:center;gap:5px" id="gn${i}">🔔 WhatsApp alerts on for matching opportunities</div>
+    </div>`).join("");
+}
+function togGrp(name,i){joined[name]=!joined[name];const b=document.getElementById("gb"+i);const n=document.getElementById("gn"+i);b.textContent=joined[name]?"✓ Joined":"Join";b.className="btn bsm "+(joined[name]?"bghost":"bg");if(n)n.style.display=joined[name]?"flex":"none";showToast(joined[name]?`Joined ${name}!`:`Left ${name}`);}
+
+// MENTORS
+const MENTEES=[
+  {n:"Anjali Sharma",i:"AS",b:2022,r:"PM · Google · Hyderabad",av:"apu",track:"career",looking:"Looking for a mentor in product strategy and AI/ML. 2 years exp, aiming for senior PM role.",tags:["Product","AI/ML","Career growth"]},
+  {n:"Meera R",i:"MR",b:2024,r:"Analyst · McKinsey · Delhi",av:"apu",track:"mba",looking:"Seeking guidance on Harvard/Wharton MBA applications and building a consulting career. Fresh grad.",tags:["MBA prep","Consulting","Strategy"]},
+  {n:"Aditya P",i:"AP",b:2019,r:"SDE-III · Microsoft · Hyderabad",av:"apu",track:"startup",looking:"Want to transition from big tech to founding a startup. Looking for a founder or VC mentor.",tags:["Startup","Tech","Fundraising"]},
+  {n:"Lakshmi N",i:"LN",b:2016,r:"AVP Risk · ICICI · Chennai",av:"aam",track:"finance",looking:"Looking to move from banking into PE/VC. Seeking mentorship on breaking into fund roles.",tags:["Finance","PE/VC","Career growth"]},
+];
+
+let mentorMode="offer";
+
+function setMentorMode(mode){
+  mentorMode=mode;
+  const off=document.getElementById("mt-offer");
+  const seek=document.getElementById("mt-seek");
+  if(!off||!seek)return;
+  const activeStyle="flex:1;text-align:center;padding:9px;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;background:var(--card);color:var(--ink);box-shadow:0 1px 4px rgba(0,0,0,.06)";
+  const inactiveStyle="flex:1;text-align:center;padding:9px;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;color:var(--mute)";
+  off.style.cssText=mode==="offer"?activeStyle:inactiveStyle;
+  seek.style.cssText=mode==="seek"?activeStyle:inactiveStyle;
+  renderMentors();
+}
+
+function renderMentors(){
+  const el=document.getElementById("mentor-list");
+  if(!el)return;
+  if(mentorMode==="offer"){
+    let data=MENTORS;
+    if(cMF!=="all")data=data.filter(m=>m.track===cMF);
+    el.innerHTML=data.length?data.map(m=>`
+      <div class="mentor-card">
+        <div class="mc-top">
+          <div class="av ${m.av}" style="width:48px;height:48px;font-size:14px;font-family:Syne,sans-serif">${m.i}</div>
+          <div class="mc-info"><div class="mc-name">${m.n} <span class="tag tgry" style="font-size:9px">'${String(m.b).slice(2)}</span></div><div class="mc-role">${m.r}</div><div class="mc-exp">${m.expertise.slice(0,3).map(tc).join("")}</div></div>
+        </div>
+        <div style="font-size:13px;color:var(--sub);line-height:1.65;margin-bottom:12px">${m.bio}</div>
+        <div class="mc-rate-row">
+          <div class="mc-slots"><strong style="color:#059669">${m.slots} slot${m.slots!==1?"s":""} open</strong><br><span style="font-size:11px">${m.mode}</span></div>
+          <button class="btn bg bsm" onclick="openCx('${m.n}','${m.r}','${m.av}','${m.i}','')">Request mentorship</button>
+        </div>
+      </div>`).join("")
+    :"<div style='text-align:center;padding:40px;color:var(--mute)'>No mentors in this track</div>";
+  } else {
+    let data=MENTEES;
+    if(cMF!=="all")data=data.filter(m=>m.track===cMF);
+    el.innerHTML="<div style='margin:0 18px 12px;font-size:13px;color:var(--mute)'>Alumni looking for mentorship — offer to guide them.</div>"
+    +(data.length?data.map(m=>`
+      <div class="mentor-card">
+        <div class="mc-top">
+          <div class="av ${m.av}" style="width:48px;height:48px;font-size:14px;font-family:Syne,sans-serif">${m.i}</div>
+          <div class="mc-info"><div class="mc-name">${m.n} <span class="tag tgry" style="font-size:9px">'${String(m.b).slice(2)}</span></div><div class="mc-role">${m.r}</div><div class="mc-exp">${m.tags.map(tc).join("")}</div></div>
+        </div>
+        <div style="font-size:13px;color:var(--sub);line-height:1.65;margin-bottom:12px">${m.looking}</div>
+        <div class="mc-rate-row">
+          <div class="mc-slots" style="font-size:12px;color:var(--mute)">Seeking guidance</div>
+          <button class="btn bg bsm" onclick="showToast('Offer sent to ${m.n}! They will get a WhatsApp notification.')">Offer to mentor</button>
+        </div>
+      </div>`).join("")
+    :"<div style='text-align:center;padding:40px;color:var(--mute)'>No mentorship requests in this track</div>");
+  }
+}
+function setMF(el,f){cMF=f;document.querySelectorAll("#mf-chips .chip").forEach(c=>c.classList.remove("on"));el.classList.add("on");renderMentors();}
+
+// FOUNDER-INVESTOR
+function renderFI(){
+  let data=STARTUPS;if(cFI!=="all")data=data.filter(s=>s.filter===cFI);
+  document.getElementById("fi-list").innerHTML=data.map(s=>`
+    <div class="vi-card">
+      <div class="vi-bar" style="background:${fiColors[s.sector]||"var(--g1)"}"></div>
+      <div class="vi-body">
+        <div class="vi-stage-row"><span class="tag tgry">${s.stage}</span>${tc(s.sector)}</div>
+        <div class="vi-title">${s.name}</div>
+        <div class="vi-sector">${s.sector}</div>
+        <div class="vi-desc">${s.desc}</div>
+        <div class="vi-metrics"><div class="vi-metric"><div class="vi-metric-n">${s.metric1.n}</div><div class="vi-metric-l">${s.metric1.l}</div></div><div class="vi-metric"><div class="vi-metric-n">${s.metric2.n}</div><div class="vi-metric-l">${s.metric2.l}</div></div><div class="vi-metric"><div class="vi-metric-n">${s.metric3.n}</div><div class="vi-metric-l">${s.metric3.l}</div></div></div>
+        <div class="vi-foot">
+          <div class="vi-poster"><div class="av ${s.cav}" style="width:28px;height:28px;font-size:9px;font-family:Syne,sans-serif">${s.co}</div><div><div class="vi-poster-name">${ALUMNI.find(a=>a.i===s.co)?.n||"Founder"}</div><div class="vi-poster-b">IIMK Founder</div></div></div>
+          <div class="vi-seek">Raising ${s.ask}</div>
+        </div>
+        <div style="font-size:11.5px;color:var(--mute);margin-bottom:11px;margin-top:6px">${s.intros} warm intros requested · ${s.views} investor views</div>
+        <div class="vi-btns"><button class="btn bo bsm" style="flex:1" onclick="showToast('Pitch deck opening…')">View deck</button><button class="btn bg bsm" style="flex:1" onclick="showToast('Warm intro requested from ${ALUMNI.find(a=>a.i===s.co)?.n||'founder'}!')">Request intro</button><button class="btn bsm" style="flex:1;background:#EDEDFF;color:var(--pu);border:none" onclick="showToast('Added to watchlist!')">Watch</button></div>
+      </div>
+    </div>`).join("");
+}
+function setFI(el,f){cFI=f;document.querySelectorAll("#fi-chips .chip").forEach(c=>c.classList.remove("on"));el.classList.add("on");renderFI();}
+function renderVenturesPreview(){document.getElementById("ventures-preview").innerHTML=STARTUPS.slice(0,3).map(s=>`<div style="display:flex;align-items:center;justify-content:space-between;padding:12px 16px;cursor:pointer;border-bottom:1px solid rgba(91,60,245,.06)" onclick="go('fi')"><div><div style="font-size:13.5px;font-weight:700;color:var(--ink)">${s.name}</div><div style="font-size:12px;color:var(--mute);margin-top:2px">${s.sector} · ${s.stage} · <span style="font-weight:700;color:var(--pu)">${s.ask}</span></div></div>${tc(s.sector)}</div>`).join("");}
+
+// SYNDICATE
+function renderSyn(){
+  document.getElementById("syn-list").innerHTML=SYN.map(d=>{
+    const pct=Math.round(d.raised/d.target*100);
+    return`<div style="background:var(--card);border:1.5px solid var(--border);border-radius:22px;margin:0 18px 10px;overflow:hidden">
+      <div style="padding:16px 16px 10px"><span class="tag ${d.sc}" style="margin-bottom:8px;display:inline-block">${d.sc==="tpu"?"Pre-IPO":d.sc==="tgr"?"Seed":"Series A"}</span><div style="font-family:Syne,sans-serif;font-size:16px;color:var(--ink);margin-bottom:3px">${d.t}</div><div style="font-size:12px;color:var(--mute);margin-bottom:5px">${d.s}</div><div style="font-size:12.5px;color:var(--pu);font-weight:700">${d.ret}</div></div>
+      <div style="padding:0 16px 12px"><div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:7px"><span style="font-weight:700;color:var(--ink)">${fmt(d.raised)} raised</span><span style="color:var(--mute)">${pct}% of ${fmt(d.target)}</span></div><div style="height:9px;background:#EDE9FF;border-radius:30px;overflow:hidden"><div class="prog-fill" data-pct="${pct}" style="width:0;background:${synColors[d.sc]}"></div></div></div>
+      <div style="padding:12px 16px;border-top:1px solid rgba(91,60,245,.07);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px">
+        <div class="av-stack">${d.inv.slice(0,4).map(iv=>`<div class="av ${iv.a}" style="width:28px;height:28px;font-size:9px;font-family:Syne,sans-serif">${iv.i}</div>`).join("")}${d.inv.length>4?`<div class="av" style="width:28px;height:28px;font-size:8px;background:#F3F4F6;color:#374151">+${d.inv.length-4}</div>`:""}</div>
+        <div style="text-align:right"><div style="font-size:10px;color:var(--mute);font-weight:700;text-transform:uppercase;letter-spacing:.06em">Min · Closes</div><div style="font-size:13.5px;font-weight:800;color:var(--ink);font-family:Syne,sans-serif;margin-top:1px">${fmt(d.min)} · ${d.close}</div></div>
+      </div>
+      <div style="padding:0 16px 16px;display:flex;gap:8px"><button class="btn bo bsm" style="flex:1" onclick="showToast('Opening DD room')">Due diligence</button><button class="btn bg bsm" style="flex:1" onclick="showToast('Participation: ${fmt(d.min)} min')">Participate</button></div>
+    </div>`;
+  }).join("");
+}
+function animProg(){document.querySelectorAll(".prog-fill[data-pct]").forEach(el=>{const p=el.dataset.pct;requestAnimationFrame(()=>el.style.width=p+"%");});}
+
+// EVENTS
+function renderEvents(){
+  let data=EVENTS;if(cEV!=="all")data=data.filter(e=>e.filter===cEV);
+  document.getElementById("ev-list").innerHTML=data.map((e,ei)=>{
+    const isPast=!!e.past;
+    const youWent=!!e.youAttended;
+    const attendeeAlumni=(e.attendees||[]).map(i=>ALUMNI_DATA.find(a=>a.i===i)).filter(Boolean);
+    return`
+    <div class="event-card">
+      <div class="ev-bar" style="background:linear-gradient(90deg,${e.color[0]},${e.color[1]})"></div>
+      <div class="ev-header">
+        <div class="ev-cover-title">${e.title}</div>
+        <div class="ev-cover-badge" style="${isPast?"background:#F3F4F6;color:#6B7280;border-color:#E5E7EB":""}">
+          ${isPast?"Past event":e.type}
+        </div>
+      </div>
+      <div class="ev-body">
+        <div class="ev-row"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/></svg>${e.date} · ${e.time}</div>
+        <div class="ev-row"><svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>${e.venue}</div>
+        <div class="ev-desc">${e.desc}</div>
+        <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px">${e.tags.map(tc).join("")}</div>
+
+        ${isPast&&youWent?`
+        <!-- PEOPLE YOU MET -->
+        <div style="background:#F0EBFF;border:1.5px solid #C4B5FD;border-radius:14px;padding:12px 14px;margin-bottom:12px">
+          <div style="font-size:12px;font-weight:800;color:var(--pu);text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px">People you met at this event</div>
+          <div style="display:flex;flex-direction:column;gap:8px">
+            ${attendeeAlumni.map(a=>`<div style="display:flex;align-items:center;gap:10px">
+              <div class="av ${a.av}" style="width:34px;height:34px;font-size:10px;font-family:Syne,sans-serif">${a.i}</div>
+              <div style="flex:1;min-width:0"><div style="font-size:13px;font-weight:700;color:var(--ink)">${a.n}</div><div style="font-size:11.5px;color:var(--mute);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${a.r} · ${a.c}</div></div>
+              <button class="btn bg bsm" style="padding:6px 12px;font-size:11px;flex-shrink:0" onclick="openCx('${a.n}','${a.r}','${a.av}','${a.i}','${a.li||""}')">Connect</button>
+            </div>`).join("")}
+          </div>
+          <div style="font-size:11.5px;color:var(--pu);margin-top:10px;font-weight:600">✓ Attendance marked by organiser · ${attendeeAlumni.length} alumni at this event</div>
+        </div>`:isPast?`
+        <div style="background:#F3F4F6;border-radius:12px;padding:10px 13px;font-size:12.5px;color:#6B7280;margin-bottom:12px">You did not attend this event.</div>`:""}
+
+        ${!isPast?`
+        <div class="ev-foot">
+          <div class="ev-attending"><div class="av-stack">${["agrd","aor","api"].map((av,i)=>`<div class="av ${av}" style="width:24px;height:24px;font-size:8px;font-family:Syne,sans-serif">${["RK","SB","DV"][i]}</div>`).join("")}</div><div class="ev-count">+${e.attending-3} going · ${e.cap-e.attending} left</div></div>
+          <div class="ev-price">${e.price===0?"Free":fmt(e.price)}</div>
+        </div>
+        <div style="margin-top:12px;display:flex;gap:8px">
+          <button class="btn bo bsm" style="flex:1" onclick="showToast('Added to calendar!')">Save</button>
+          <button class="btn bg bsm" style="flex:2" onclick="showToast('${e.price===0?"RSVP confirmed! You'll get a WA reminder.":"Opening payment for "+e.title}')">RSVP${e.price?" · "+fmt(e.price):""}</button>
+        </div>
+        `:`
+        <div style="display:flex;gap:8px">
+          <button class="btn bo bsm" style="flex:1" onclick="showToast('Opening event recap…')">View recap</button>
+          <button class="btn bsm" style="flex:1;background:#ECFDF5;color:#059669;border:1.5px solid #A7F3D0" onclick="selfCheckIn(this,'${e.title}',${ei})">✓ I attended</button>
+        </div>`}
+      </div>
+    </div>`;
+  }).join("");
+}
+function setEV(el,f){cEV=f;document.querySelectorAll("#ev-chips .chip").forEach(c=>c.classList.remove("on"));el.classList.add("on");renderEvents();}
+
+// JOBS
+function renderJobs(){
+  let data=JOBS;if(cJobs!=="all")data=data.filter(j=>j.filter===cJobs||cJobs==="exec"&&j.level==="C-Suite");
+  document.getElementById("jobs-list").innerHTML=data.map(j=>`
+    <div class="job-card">
+      <div class="jc-top">
+        <div style="width:4px;height:44px;border-radius:4px;background:var(--g1);flex-shrink:0;align-self:center"></div>
+        <div class="jc-co"><div class="jc-co-name">${j.co}</div><div class="jc-co-loc">📍 ${j.loc} · ${j.type}</div></div>
+        <span class="tag tgry">${j.level}</span>
+      </div>
+      <div class="jc-title">${j.title}</div>
+      <div class="jc-details">${j.tags.map(tc).join("")}</div>
+      <div class="jc-desc" style="font-size:13px;color:var(--sub);line-height:1.65;margin-bottom:11px">${j.desc}</div>
+      <div class="jc-referrer"><div class="av ${j.refav}" style="width:28px;height:28px;font-size:9px;font-family:Syne,sans-serif">${j.refav[1].toUpperCase()}</div><div class="jc-ref-txt">Referred by <strong>${j.referrer}</strong> · Batch ${j.refbatch} · IIMK alumni</div></div>
+      <div class="jc-btns"><button class="btn bg bsm" style="flex:1" onclick="showToast('Applied via referral! ${j.referrer} has been notified.')">Apply via referral</button><button class="btn bo bsm" onclick="openCx(j.referrer,j.referrer+' · '+j.co,'aor',j.referrer.split(\' \').map(w=>w[0]).join(\'\').slice(0,2),\'\')">Message ${j.referrer.split(' ')[0]}</button></div>
+      <div style="font-size:11px;color:var(--mute);margin-top:9px">Posted ${j.posted} · Alumni-exclusive listing</div>
+    </div>`).join("");
+}
+function setJobs(el,f){cJobs=f;document.querySelectorAll("#job-chips .chip").forEach(c=>c.classList.remove("on"));el.classList.add("on");renderJobs();}
+
+// K-MATCH
+const KMP_LI={
+  "Suresh B":"https://www.linkedin.com/in/suresh-b-sequoia",
+  "Rahul Nair":"https://www.linkedin.com/in/rahul-nair-finphi",
+  "Anjali Sharma":"",
+  "Nisha T":"https://www.linkedin.com/in/nisha-t-cred",
+  "Prasad K":"https://www.linkedin.com/in/prasad-k-dataweave"
+};
+function setKmf(el,f){cKmf=f;cKi=0;document.querySelectorAll("#kmf-chips .chip").forEach(c=>c.classList.remove("on"));el.classList.add("on");renderKM();}
+function renderKM(){
+  let profs=KMP;if(cKmf==="investor")profs=profs.filter(p=>p.type==="investor");else if(cKmf==="founder")profs=profs.filter(p=>p.type==="founder");else if(cKmf==="exec")profs=profs.filter(p=>p.type==="exec");else if(cKmf==="batch")profs=profs.filter(p=>Math.abs(p.b-2016)<=4);
+  const card=document.getElementById("kmc");const prog=document.getElementById("kmprog");
+  if(!profs.length){card.innerHTML=`<div style="text-align:center;padding:80px 20px"><div style="font-size:48px;margin-bottom:12px">🎯</div><div style="color:var(--mute)">No profiles in this filter</div><button class="btn bo bsm" style="margin-top:14px" onclick="setKmf(document.querySelector('#kmf-chips .chip'),'all')">Show all</button></div>`;prog.textContent="";return;}
+  const p=profs[cKi%profs.length];
+  const kmli=KMP_LI[p.n]||"";
+  card.innerHTML=`
+    <div class="swipe-label connect" id="km-lbl-connect">CONNECT</div>
+    <div class="swipe-label skip" id="km-lbl-skip">SKIP</div>
+    <div class="kmc-glow"></div>
+    <div style="position:relative;margin-bottom:11px"><div class="kmc-ring"></div><div class="av ${p.av} kmc-av" style="font-family:Syne,sans-serif">${p.i}</div></div>
+    <div class="kmc-name">${p.n}</div>
+    <div class="kmc-role">Batch '${String(p.b).slice(2)} · ${p.r}</div>
+    <div class="kmc-score"><div class="kmc-pct" id="kmpct">0%</div><div class="kmc-lbl">match score · Common: ${p.common}</div></div>
+    <div class="kmc-tags">${p.tags.map(tc).join("")}</div>
+    <div class="kmc-btns">
+      <div class="kmc-action" onclick="skipKM()" style="font-size:22px;color:#DC2626;background:#FEF2F2;border-color:#FECACA" title="Skip">✕</div>
+      <button class="kmc-cta" onclick="connectKM('${p.n}','${p.r}','${p.av}','${p.i}','${kmli}')">Connect</button>
+      <div class="kmc-action" style="font-size:22px;color:#16A34A;background:#F0FDF4;border-color:#BBF7D0" onclick="connectKM('${p.n}','${p.r}','${p.av}','${p.i}','${kmli}')" title="Like">♡</div>
+    </div>
+    ${kmli?`<div class="km-li-btn" onclick="openLI('${kmli}','${p.n}')"><svg viewBox="0 0 24 24"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>View LinkedIn profile</div>`:""}
+  `;
+  card._kmData=[p.n,p.r,p.av,p.i,kmli];
+  initSwipe(card);
+  prog.textContent=`${(cKi%profs.length)+1} of ${profs.length} suggestions`;
+  let v=0;const s=p.pct/36;const ti=setInterval(()=>{v=Math.min(v+s,p.pct);const el=document.getElementById("kmpct");if(el)el.textContent=Math.round(v)+"%";if(v>=p.pct)clearInterval(ti);},14);
+}
+function skipKM(){const c=document.getElementById("kmc");c.classList.add("snap","bl");setTimeout(()=>{c.classList.remove("snap","bl");cKi++;renderKM();},320);}
+function connectKM(n,role,av,init,li){const c=document.getElementById("kmc");c.classList.add("snap","br");setTimeout(()=>{c.classList.remove("snap","br");cKi++;renderKM();openPostConnect(n,role,av,init,li);},320);}
+
+// Connect sheet
+let cxLI="";
+function openCx(name,role,av,init,li){cxLI=li;const ov=document.getElementById("cx-ov");const sh=document.getElementById("cx-sh");ov.classList.add("on");sh.classList.add("on");const avEl=document.getElementById("cx-av");avEl.className="av "+av;avEl.textContent=init;avEl.style.cssText="width:52px;height:52px;font-size:16px;font-family:Syne,sans-serif;flex-shrink:0";document.getElementById("cx-name").textContent=name;document.getElementById("cx-role").textContent=role;document.getElementById("cx-msg").value="Hi "+name.split(" ")[0]+", I'm Ravan Kulkarni from IIMK Batch '16 (VP Alumni Association). Would love to connect and explore synergies!";const liBlock=document.getElementById("cx-li-block");const liUrl=document.getElementById("cx-li-url");if(li){liBlock.style.display="flex";liBlock.onclick=()=>openLI(li,name);liUrl.textContent=li.replace("https://www.linkedin.com/in/","linkedin.com/in/");}else{liBlock.style.display="none";}}
+function closeCx(){document.getElementById("cx-ov").classList.remove("on");document.getElementById("cx-sh").classList.remove("on");}
+function sendCx(){
+  const name=document.getElementById("cx-name").textContent;
+  const role=document.getElementById("cx-role").textContent;
+  closeCx();
+  showToast("Request sent to "+name+"! 🎉");
+  // Simulate: they accept after 2s
+  setTimeout(()=>{openPostConnect(name,role,document.getElementById("cx-av").className.replace("av ","").trim(),name.split(" ").map(w=>w[0]).join("").toUpperCase().slice(0,2),cxLI);},2000);
+}
+function openLI(url,name){if(!url){showToast("LinkedIn profile not synced yet");return;}window.open(url,"_blank");}
+
+// CHAT
+function renderCL(){document.getElementById("chat-list").innerHTML=CHATS.map(c=>`<div class="chat-row" onclick="openChat(${c.id})"><div class="chat-av-w"><div class="av ${c.av}" style="width:50px;height:50px;font-size:14px;font-family:Syne,sans-serif">${c.i}</div>${c.online?'<div class="odot"></div>':""}</div><div class="chat-inf"><div class="chat-nm">${c.name}${c.group?` <span class="tag tgry" style="font-size:9px;padding:1px 7px">Group</span>`:""}</div><div class="chat-pr">${c.last}</div></div><div class="chat-mt"><div class="chat-tm">${c.time}</div>${c.unread?`<div class="chat-ud">${c.unread}</div>`:""}</div></div>`).join("");}
+
+// IndexedDB
+const DBN="KNet4",V=1,ST="m";let db=null;
+function openDB(){return new Promise((res,rej)=>{if(db)return res(db);const r=indexedDB.open(DBN,V);r.onupgradeneeded=e=>{const d=e.target.result;if(!d.objectStoreNames.contains(ST)){const s=d.createObjectStore(ST,{autoIncrement:true});s.createIndex("cid","cid");}};r.onsuccess=e=>{db=e.target.result;res(db);};r.onerror=e=>rej(e);});}
+async function dbSv(cid,from,text){const d=await openDB();const ts=Date.now();const t=new Date(ts).toLocaleTimeString("en-IN",{hour:"2-digit",minute:"2-digit"});return new Promise((res,rej)=>{const tx=d.transaction(ST,"readwrite");tx.objectStore(ST).add({cid,from,text,ts,t});tx.oncomplete=()=>res({cid,from,text,ts,t});tx.onerror=rej;});}
+async function dbGet(cid){const d=await openDB();return new Promise((res,rej)=>{const req=d.transaction(ST,"readonly").objectStore(ST).index("cid").getAll(cid);req.onsuccess=e=>res((e.target.result||[]).sort((a,b)=>a.ts-b.ts).slice(-60));req.onerror=rej;});}
+async function dbSeed(){const ex=await dbGet(1);if(ex.length)return;const seeds=[[1,"them","Hey Ravan! Great to connect on K·Network."],[1,"me","Thanks Suresh! Would love to exchange notes on FinTech."],[1,"them","Open for a quick call this week?"],[1,"me","Thursday works — I'll DM you my calendar."],[1,"them","Looking forward to it! 🙏"],[2,"them","[Vikram K]: Anyone attending the Startup Summit?"],[2,"me","Planning to go — should we get the Hyd alumni together?"],[2,"them","[Vikram K]: Absolutely! I'll book a table at the afterparty."]];for(const[c,f,t]of seeds)await dbSv(c,f,t);}
+async function loadMsgs(id){const msgs=await dbGet(id);const c=CHATS.find(x=>x.id===id)||CHATS[0];const area=document.getElementById("msgs");if(!msgs.length){area.innerHTML=`<div class="day-sep">Start of your conversation</div>`;return;}let html="",lf="";msgs.forEach((m,i)=>{if(i===0||Math.abs(msgs[i].ts-(msgs[i-1]?.ts||0))>300000)html+=`<div class="day-sep">${m.t}</div>`;const sav=m.from!=="me"&&m.from!==lf;html+=`<div class="mr ${m.from==="me"?"me":""}">`;if(m.from!=="me"){html+=sav?`<div class="av ${c.av}" style="width:26px;height:26px;font-size:8px;align-self:flex-end;flex-shrink:0;font-family:Syne,sans-serif">${c.i}</div>`:`<div style="width:26px;flex-shrink:0"></div>`;}html+=`<div class="bub ${m.from==="me"?"me":"them"}">${m.text}</div></div>`;lf=m.from;});area.innerHTML=html;area.scrollTop=area.scrollHeight;}
+async function sendMsg(){const inp=document.getElementById("msg-inp");const text=inp.value.trim();if(!text)return;inp.value="";inp.style.height="auto";await dbSv(cCid,"me",text);await loadMsgs(cCid);const area=document.getElementById("msgs");const c=CHATS.find(x=>x.id===cCid)||CHATS[0];const ty=document.createElement("div");ty.className="typing-row";ty.innerHTML=`<div class="av ${c.av}" style="width:26px;height:26px;font-size:8px;flex-shrink:0;font-family:Syne,sans-serif">${c.i}</div><div class="typing-bub"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>`;area.appendChild(ty);area.scrollTop=area.scrollHeight;const replies=["Got it! Will revert shortly.","Sounds great 👍","Let me check and come back.","Interesting! Tell me more.","Absolutely, let's sync.","Sure, share the details!"];setTimeout(async()=>{ty.remove();await dbSv(cCid,"them",replies[Math.floor(Math.random()*replies.length)]);await loadMsgs(cCid);},1400);}
+
+// NOTIFS
+function openNotif(){document.getElementById("n-ov").classList.add("on");document.getElementById("n-sh").classList.add("on");document.getElementById("n-body").innerHTML=NOTIFS.map(n=>`<div class="notif-item ${n.u?"unread":""}"><div class="notif-ico" style="background:${n.bg}">${n.icon}</div><div class="notif-body"><div class="notif-txt">${n.txt}</div><div class="notif-time">${n.ts}</div></div>${n.u?'<div class="notif-dot"></div>':""}</div>`).join("");}
+function closeNotif(){document.getElementById("n-ov").classList.remove("on");document.getElementById("n-sh").classList.remove("on");}
+function markRead(){NOTIFS.forEach(n=>n.u=false);document.querySelectorAll(".notif-item").forEach(e=>e.classList.remove("unread"));document.querySelectorAll(".notif-dot").forEach(d=>d.remove());document.querySelector(".rdot").style.display="none";showToast("All notifications read!");closeNotif();}
+
+// POST + PITCH sheets
+function openPost(){document.getElementById("p-ov").classList.add("on");document.getElementById("p-sh").classList.add("on");}
+function closePost(){document.getElementById("p-ov").classList.remove("on");document.getElementById("p-sh").classList.remove("on");}
+function openPitch(){document.getElementById("pi-ov").classList.add("on");document.getElementById("pi-sh").classList.add("on");}
+function closePitch(){document.getElementById("pi-ov").classList.remove("on");document.getElementById("pi-sh").classList.remove("on");}
+function setPT(el){document.querySelectorAll(".type-cell").forEach(c=>c.classList.remove("on"));el.classList.add("on");}
+
+
+// POST-CONNECT SHEET
+let pcLIUrl="";
+function openPostConnect(name,role,av,init,li){
+  pcLIUrl=li||"";
+  document.getElementById("pc-name").textContent=name;
+  document.getElementById("pc-sub").innerHTML='Connected with <strong>'+name+'</strong> · '+role;
+  // WA message preview
+  const msg=encodeURIComponent("Hi "+name.split(" ")[0]+"! I'm Ravan Kulkarni from IIMK Batch '16. Great connecting on K·Network! Looking forward to staying in touch.");
+  document.getElementById("pc-wa-preview").textContent="Pre-filled intro message ready";
+  document.getElementById("pc-wa-call").onclick=function(e){e.preventDefault();pcCall(name);};
+  document.getElementById("pc-wa-msg").onclick=function(e){e.preventDefault();pcMsg(name,msg);};
+  // LinkedIn
+  const liBtn=document.getElementById("pc-li-btn");
+  if(li){document.getElementById("pc-li-url").textContent=li.replace("https://www.linkedin.com/in/","linkedin.com/in/");liBtn.style.display="flex";}
+  else{liBtn.style.display="none";}
+  document.getElementById("pc-ov").classList.add("on");
+  document.getElementById("pc-sh").classList.add("on");
+}
+function closePc(){document.getElementById("pc-ov").classList.remove("on");document.getElementById("pc-sh").classList.remove("on");}
+function pcCall(name){window.open("https://wa.me/?text=Calling+from+K·Network+IIMK","_blank");showToast("Opening WhatsApp call…");closePc();}
+function pcMsg(name,msg){const url=msg?("https://wa.me/?text="+msg):"https://wa.me/";window.open(url,"_blank");showToast("Opening WhatsApp…");closePc();}
+function pcLI(){if(pcLIUrl)window.open(pcLIUrl,"_blank");else showToast("LinkedIn not synced yet");closePc();}
+
+
+// ── SWIPE GESTURES ──────────────────────────────
+let swStartX=0,swStartY=0,swDragging=false,swDx=0,swCard=null;
+const SW_THRESHOLD=90;
+
+function initSwipe(card){
+  swCard=card;
+  card.addEventListener("touchstart",swStart,{passive:true});
+  card.addEventListener("touchmove",swMove,{passive:false});
+  card.addEventListener("touchend",swEnd,{passive:true});
+  card.addEventListener("mousedown",swStart);
+  document.addEventListener("mousemove",swMove);
+  document.addEventListener("mouseup",swEnd);
+}
+
+function swStart(e){
+  if(e.target.closest("button,.kmc-action,.km-li-btn,.kmc-cta"))return;
+  swDragging=true;swDx=0;
+  const pt=e.touches?e.touches[0]:e;
+  swStartX=pt.clientX;swStartY=pt.clientY;
+  if(swCard)swCard.style.transition="none";
+}
+
+function swMove(e){
+  if(!swDragging||!swCard)return;
+  if(e.cancelable&&e.preventDefault)e.preventDefault();
+  const pt=e.touches?e.touches[0]:e;
+  swDx=pt.clientX-swStartX;
+  const dy=pt.clientY-swStartY;
+  if(Math.abs(dy)>Math.abs(swDx)*1.5&&Math.abs(swDx)<20){swDragging=false;return;}
+  const rot=swDx*0.08;
+  swCard.style.transform=`translateX(${swDx}px) rotate(${rot}deg)`;
+  const ratio=Math.min(Math.abs(swDx)/SW_THRESHOLD,1);
+  const cl=document.getElementById("km-lbl-connect");
+  const sl=document.getElementById("km-lbl-skip");
+  if(cl&&sl){
+    if(swDx>0){cl.style.opacity=ratio;sl.style.opacity=0;}
+    else{sl.style.opacity=ratio;cl.style.opacity=0;}
+  }
+}
+
+function swEnd(e){
+  if(!swDragging||!swCard)return;
+  swDragging=false;
+  document.removeEventListener("mousemove",swMove);
+  document.removeEventListener("mouseup",swEnd);
+  if(swDx>SW_THRESHOLD){connectKM(...swCard._kmData);}
+  else if(swDx<-SW_THRESHOLD){skipKM();}
+  else{
+    swCard.style.transition="transform .35s cubic-bezier(.4,0,.2,1)";
+    swCard.style.transform="none";
+    const cl=document.getElementById("km-lbl-connect");
+    const sl=document.getElementById("km-lbl-skip");
+    if(cl)cl.style.opacity=0;if(sl)sl.style.opacity=0;
+  }
+  swDx=0;
+}
+
+
+
+// ═══ COMPANY DIRECTORY ═══
+const COMPANIES=[
+  {name:"Finphi Technologies",founder:"Rahul Nair",batch:"'16",sector:"FinTech",filter:"fintech",stage:"Seed",arr:"₹30L ARR",team:12,hq:"Bengaluru",desc:"B2B FinTech SaaS automating reconciliation for NBFCs and cooperative banks.",fi:"RN",fav:"aor",hiring:true,investing:false},
+  {name:"GreenMile EV",founder:"Sunita P",batch:"'10",sector:"CleanTech",filter:"cleantech",stage:"Series A",arr:"450+ stations",team:85,hq:"Pune",desc:"EV charging infrastructure across 8 Indian cities. HPCL partnership.",fi:"SP",fav:"ate",hiring:true,investing:false},
+  {name:"DataWeave",founder:"Prasad K",batch:"'13",sector:"SaaS / AI",filter:"saas",stage:"Pre-Series A",arr:"₹1.2Cr ARR",team:34,hq:"Bengaluru",desc:"AI-powered competitive intelligence and pricing analytics for e-commerce brands.",fi:"PK",fav:"apu",hiring:true,investing:false},
+  {name:"Sharkify Technology",founder:"Ravan Kulkarni",batch:"'16",sector:"SaaS / AI",filter:"saas",stage:"Revenue",arr:"₹-",team:8,hq:"Hyderabad",desc:"WhatsApp automation SaaS (Shyra.pro) for Indian SMEs. Telugu media network (Kaizer News, 2.6M subs).",fi:"RK",fav:"aor",hiring:true,investing:false},
+  {name:"HealthKart B2B",founder:"Vijay K",batch:"'07",sector:"D2C / Health",filter:"d2c",stage:"Pre-IPO",arr:"₹6Cr ARR",team:340,hq:"Delhi",desc:"B2B nutraceutical supply to 350+ clinics and hospital chains across India.",fi:"VK",fav:"api",hiring:false,investing:true},
+  {name:"AgriLink",founder:"Vijay K",batch:"'07",sector:"AgriTech",filter:"saas",stage:"MVP",arr:"200 farmers",team:6,hq:"Telangana",desc:"Direct market linkage platform connecting farmers to institutional buyers.",fi:"VK",fav:"api",hiring:false,investing:false},
+  {name:"NutriSense AI",founder:"Meera R",batch:"'24",sector:"HealthTech",filter:"health",stage:"Seed",arr:"₹8L MRR",team:14,hq:"Bengaluru",desc:"AI-powered personalised nutrition for diabetics. Integrates CGM data with lifestyle.",fi:"MR",fav:"apu",hiring:true,investing:false},
+];
+let coFilter="all";
+function setCoFilter(el,f){coFilter=f;document.querySelectorAll("#co-chips .chip").forEach(c=>c.classList.remove("on"));el.classList.add("on");renderCompanies();}
+function renderCompanies(){
+  const q=((document.getElementById("coq")||{}).value||"").toLowerCase();
+  let data=COMPANIES;
+  if(coFilter!=="all")data=data.filter(d=>d.filter===coFilter);
+  if(q)data=data.filter(d=>d.name.toLowerCase().includes(q)||d.sector.toLowerCase().includes(q)||d.hq.toLowerCase().includes(q)||d.founder.toLowerCase().includes(q));
+  const el=document.getElementById("co-list");
+  if(!el)return;
+  el.innerHTML=data.map(d=>`
+    <div class="cardf" style="margin:0 18px 10px;background:var(--card);border:1.5px solid var(--border);border-radius:20px;overflow:hidden">
+      <div style="padding:14px 14px 10px">
+        <div style="display:flex;align-items:flex-start;gap:12px;margin-bottom:10px">
+          <div class="av ${d.fav}" style="width:44px;height:44px;font-size:13px;font-family:Syne,sans-serif;border-radius:13px">${d.fi}</div>
+          <div style="flex:1;min-width:0">
+            <div style="font-family:Syne,sans-serif;font-size:15px;color:var(--ink)">${d.name}</div>
+            <div style="font-size:12px;color:var(--mute);margin-top:2px">${d.hq} · ${d.team} people · ${d.stage}</div>
+            <div style="font-size:11.5px;color:var(--pu);font-weight:700;margin-top:2px">${d.arr}</div>
+          </div>
+          ${tc(d.sector)}
+        </div>
+        <div style="font-size:13px;color:var(--sub);line-height:1.6;margin-bottom:10px">${d.desc}</div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px">
+          <div style="font-size:12px;color:var(--sub)">Founded by <strong style="color:var(--ink)">${d.founder}</strong> · Batch ${d.batch}</div>
+        </div>
+        <div style="display:flex;gap:6px">
+          ${d.hiring?`<span style="background:#ECFDF5;color:#059669;font-size:11px;font-weight:700;padding:3px 9px;border-radius:20px">Hiring</span>`:""}
+          ${d.investing?`<span style="background:#EDEDFF;color:#3730A3;font-size:11px;font-weight:700;padding:3px 9px;border-radius:20px">Seeking investment</span>`:""}
+        </div>
+      </div>
+      <div style="padding:0 14px 14px;display:flex;gap:8px">
+        <button class="btn bo bsm" style="flex:1" onclick="showToast('Opening ${d.name} profile')">View company</button>
+        <button class="btn bg bsm" style="flex:1" onclick="openCx('${d.founder}','Founder · ${d.name}','${d.fav}','${d.fi}','')">Connect</button>
+      </div>
+    </div>`).join("") || "<div style='text-align:center;padding:40px;color:var(--mute)'>No companies found</div>";
+}
+
+// ═══ WARM INTRO ═══
+function openWarmIntro(name,init,av){
+  // Find mutual connections
+  const mutuals=ALUMNI_DATA.filter(a=>a.i!==init&&a.open).slice(0,3);
+  const paths=mutuals.length?mutuals.map(m=>`<div style="display:flex;align-items:center;gap:8px;padding:11px 0;border-bottom:1px solid rgba(91,60,245,.07)"><div class="av ${m.av}" style="width:32px;height:32px;font-size:10px;font-family:Syne,sans-serif">${m.i}</div><div style="flex:1"><div style="font-size:13px;font-weight:600;color:var(--ink)">${m.n}</div><div style="font-size:11.5px;color:var(--mute)">${m.r} · ${m.c}</div></div><button class="btn bg bsm" style="padding:6px 12px;font-size:11px" onclick="showToast('Intro request sent to ${m.n}! They will get a WA message.')">Ask ${m.i} to intro</button></div>`).join(""):`<div style="color:var(--mute);font-size:13px;padding:16px 0">No mutual connections found. Connect directly instead.</div>`;
+  
+  let m=document.getElementById("wi-modal");
+  if(!m){m=document.createElement("div");m.id="wi-modal";m.className="sov";m.innerHTML=`<div class="sh" onclick="event.stopPropagation()" style="max-height:75%"><div class="sh-hnd"></div><div style="padding:18px 20px 0"><div style="font-family:Syne,sans-serif;font-size:18px;color:var(--ink);margin-bottom:4px">Warm intro to <span id="wi-name"></span></div><div style="font-size:13px;color:var(--mute);margin-bottom:16px">Ask a mutual connection to introduce you — higher response rate than a cold request.</div><div id="wi-paths" style="padding:0 0 4px"></div><div style="margin-top:14px;padding-top:14px;border-top:1px solid var(--border)"><button class="btn bo bfull" onclick="document.getElementById('wi-modal').classList.remove('on')" style="margin-bottom:16px">Close</button></div></div></div>`;m.onclick=function(e){if(e.target===m)m.classList.remove("on");};document.getElementById("app").appendChild(m);}
+  document.getElementById("wi-name").textContent=name;
+  document.getElementById("wi-paths").innerHTML=paths;
+  m.classList.add("on");document.querySelector("#wi-modal .sh").classList.add("on");
+}
+
+// ═══ DEAL ROOM ═══
+function openDealRoom(btn){
+  let m=document.getElementById("dr-modal");
+  if(!m){m=document.createElement("div");m.id="dr-modal";m.className="sov";m.innerHTML=`<div class="sh" onclick="event.stopPropagation()" style="max-height:85%"><div class="sh-hnd"></div><div style="padding:18px 20px 0;overflow-y:auto;max-height:calc(85vh - 30px)"><div style="font-family:Syne,sans-serif;font-size:18px;color:var(--ink);margin-bottom:4px">Deal Room</div><div style="font-size:12.5px;color:var(--mute);margin-bottom:16px">Powered by Leegality · All documents are legally binding e-signatures</div>
+    <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:16px">
+      <div style="background:var(--bg);border:1.5px solid var(--border);border-radius:14px;padding:13px 14px;display:flex;align-items:center;gap:12px"><div style="width:36px;height:36px;border-radius:10px;background:#ECFDF5;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">📄</div><div style="flex:1"><div style="font-size:13.5px;font-weight:700;color:var(--ink)">Term sheet</div><div style="font-size:11.5px;color:var(--mute);margin-top:1px">Uploaded by deal lead · Apr 1, 2026</div></div><span style="font-size:11px;font-weight:700;padding:3px 9px;border-radius:20px;background:#ECFDF5;color:#059669">Signed ✓</span></div>
+      <div style="background:var(--bg);border:1.5px solid var(--border);border-radius:14px;padding:13px 14px;display:flex;align-items:center;gap:12px"><div style="width:36px;height:36px;border-radius:10px;background:#EDEDFF;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">📋</div><div style="flex:1"><div style="font-size:13.5px;font-weight:700;color:var(--ink)">LLP SPV agreement</div><div style="font-size:11.5px;color:var(--mute);margin-top:1px">Leegality e-sign · Pending your signature</div></div><button class="btn bg bsm" onclick="showToast('Opening Leegality e-sign flow…')">Sign now</button></div>
+      <div style="background:var(--bg);border:1.5px solid var(--border);border-radius:14px;padding:13px 14px;display:flex;align-items:center;gap:12px"><div style="width:36px;height:36px;border-radius:10px;background:#FFF0EB;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">💸</div><div style="flex:1"><div style="font-size:13.5px;font-weight:700;color:var(--ink)">Capital transfer</div><div style="font-size:11.5px;color:var(--mute);margin-top:1px">Razorpay escrow · ₹2L committed</div></div><button class="btn bg bsm" onclick="showToast('Opening Razorpay payment…')">Pay now</button></div>
+      <div style="background:var(--bg);border:1.5px solid var(--border);border-radius:14px;padding:13px 14px;display:flex;align-items:center;gap:12px"><div style="width:36px;height:36px;border-radius:10px;background:#FFF0EB;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">📊</div><div style="flex:1"><div style="font-size:13.5px;font-weight:700;color:var(--ink)">Due diligence materials</div><div style="font-size:11.5px;color:var(--mute);margin-top:1px">Financials, cap table, pitch deck · NDA required</div></div><button class="btn bo bsm" onclick="showToast('NDA sent for signature before access')">Request access</button></div>
+    </div>
+    <div style="background:#FFFBEB;border:1.5px solid #FDE68A;border-radius:13px;padding:11px 13px;font-size:12.5px;color:#78350F;margin-bottom:16px">⚠ SEBI-compliant LLP SPV · All investments are subject to signed SPV agreement and completed KYC. Minimum ticket ₹1L.</div>
+    <button class="btn bo bfull" onclick="document.getElementById('dr-modal').classList.remove('on')" style="margin-bottom:20px">Close</button></div></div>`;m.onclick=function(e){if(e.target===m)m.classList.remove("on");};document.getElementById("app").appendChild(m);}
+  m.classList.add("on");document.querySelector("#dr-modal .sh").classList.add("on");
+}
+
+// ═══ REUNION ═══
+function setRSVP(v){
+  ["yes","maybe","no"].forEach(s=>{const el=document.getElementById("rv-"+s);if(el){el.style.borderColor="var(--border)";el.style.background="var(--card)";el.querySelectorAll("div:last-child").forEach(d=>d.style.color="var(--mute)");}});
+  const el=document.getElementById("rv-"+v);
+  if(el){el.style.borderColor="var(--pu)";el.style.background="#EDEDFF";el.querySelectorAll("div:last-child").forEach(d=>d.style.color="var(--pu)");}
+  showToast(v==="yes"?"RSVP confirmed! Payment link sent via WhatsApp 🎉":v==="maybe"?"Noted! We'll remind you closer to the date":"Sorry you can't make it. We'll send updates.");
+}
+function renderReunion(){
+  const el=document.getElementById("reunion-attendees");if(!el)return;
+  el.innerHTML=ALUMNI_DATA.filter(a=>a.b===2016).map(a=>`<div style="display:flex;align-items:center;gap:10px;padding:10px 16px;border-bottom:1px solid rgba(91,60,245,.07)"><div class="av ${a.av}" style="width:32px;height:32px;font-size:10px;font-family:Syne,sans-serif">${a.i}</div><div style="flex:1"><div style="font-size:13px;font-weight:600;color:var(--ink)">${a.n}</div><div style="font-size:11.5px;color:var(--mute)">${a.r} · ${a.c}</div></div><span style="font-size:11px;font-weight:700;padding:2px 9px;border-radius:20px;background:#ECFDF5;color:#059669">✓ Confirmed</span></div>`).join("");
+}
+
+// ═══ LEADERBOARD ═══
+let lbMode="connects";
+function setLB(el,mode){lbMode=mode;document.querySelectorAll("#lb-chips .chip").forEach(c=>c.classList.remove("on"));el.classList.add("on");renderLeaderboard();}
+function renderLeaderboard(){
+  const el=document.getElementById("lb-list");if(!el)return;
+  const data={
+    connects:[
+      {n:"Suresh B",i:"SB",av:"ate",batch:"'07",score:342,unit:"connections",badge:"🥇"},
+      {n:"Karthik Iyer",i:"KI",av:"aam",batch:"'10",score:289,unit:"connections",badge:"🥈"},
+      {n:"Deepa V",i:"DV",av:"api",batch:"'13",score:241,unit:"connections",badge:"🥉"},
+      {n:"Rahul Nair",i:"RN",av:"aor",batch:"'16",score:198,unit:"connections",badge:"4"},
+      {n:"Nisha T",i:"NT",av:"api",batch:"'19",score:176,unit:"connections",badge:"5"},
+      {n:"Prasad K",i:"PK",av:"apu",batch:"'13",score:154,unit:"connections",badge:"6"},
+      {n:"Ravan Kulkarni",i:"RK",av:"aor",batch:"'16",score:142,unit:"connections",badge:"7",isYou:true},
+    ],
+    intros:[
+      {n:"Suresh B",i:"SB",av:"ate",batch:"'07",score:28,unit:"intros made",badge:"🥇"},
+      {n:"Karthik Iyer",i:"KI",av:"aam",batch:"'10",score:19,unit:"intros made",badge:"🥈"},
+      {n:"Ravan Kulkarni",i:"RK",av:"aor",batch:"'16",score:12,unit:"intros made",badge:"3",isYou:true},
+      {n:"Deepa V",i:"DV",av:"api",batch:"'13",score:9,unit:"intros made",badge:"4"},
+      {n:"Rohit G",i:"RG",av:"aor",batch:"'13",score:7,unit:"intros made",badge:"5"},
+    ],
+    deals:[
+      {n:"Suresh B",i:"SB",av:"ate",batch:"'07",score:14,unit:"deals closed",badge:"🥇"},
+      {n:"Karthik Iyer",i:"KI",av:"aam",batch:"'10",score:11,unit:"deals closed",badge:"🥈"},
+      {n:"Rahul Nair",i:"RN",av:"aor",batch:"'16",score:6,unit:"deals closed",badge:"🥉"},
+      {n:"Ravan Kulkarni",i:"RK",av:"aor",batch:"'16",score:3,unit:"deals closed",badge:"4",isYou:true},
+    ],
+    referrals:[
+      {n:"Nisha T",i:"NT",av:"api",batch:"'19",score:12,unit:"job referrals",badge:"🥇"},
+      {n:"Rohit G",i:"RG",av:"aor",batch:"'13",score:9,unit:"job referrals",badge:"🥈"},
+      {n:"Priya Menon",i:"PM",av:"apu",batch:"'19",score:7,unit:"job referrals",badge:"🥉"},
+      {n:"Ravan Kulkarni",i:"RK",av:"aor",batch:"'16",score:4,unit:"job referrals",badge:"4",isYou:true},
+    ]
+  };
+  const list=data[lbMode]||data.connects;
+  el.innerHTML=`<div style="background:var(--card);border:1.5px solid var(--border);border-radius:20px;margin:0 18px 10px;overflow:hidden">`+list.map((p,i)=>`
+    <div style="display:flex;align-items:center;gap:12px;padding:13px 16px;border-bottom:1px solid rgba(91,60,245,.07);${p.isYou?"background:rgba(91,60,245,.04)":""}">
+      <div style="width:28px;text-align:center;font-size:${i<3?'18':'13'}px;font-weight:800;color:${i<3?"var(--am)":"var(--mute)"};flex-shrink:0">${p.badge}</div>
+      <div class="av ${p.av}" style="width:38px;height:38px;font-size:11px;font-family:Syne,sans-serif">${p.i}</div>
+      <div style="flex:1"><div style="font-size:14px;font-weight:700;color:var(--ink)">${p.n} ${p.isYou?"<span style='font-size:11px;background:#EDEDFF;color:var(--pu);padding:2px 8px;border-radius:20px;font-weight:700'>You</span>":""}</div><div style="font-size:11.5px;color:var(--mute);margin-top:2px">Batch ${p.batch}</div></div>
+      <div style="text-align:right"><div style="font-family:Syne,sans-serif;font-size:18px;color:var(--ink);font-weight:700">${p.score}</div><div style="font-size:10px;color:var(--mute)">${p.unit}</div></div>
+    </div>`).join("")+"</div>";
+}
+
+
+
+// ═══ SELF CHECK-IN ═══
+const checkedInEvents = new Set();
+
+function selfCheckIn(btn, eventTitle, eventIdx) {
+  if(checkedInEvents.has(eventIdx)){
+    showToast("Already checked in to this event");
+    return;
+  }
+  checkedInEvents.add(eventIdx);
+  btn.textContent = "✓ Checked in";
+  btn.style.background = "#059669";
+  btn.style.color = "#fff";
+  btn.style.borderColor = "#059669";
+  btn.disabled = true;
+
+  // Record in event data
+  const evt = EVENTS[eventIdx];
+  if(evt){
+    evt.youAttended = true;
+    if(!evt.attendees) evt.attendees = [];
+    if(!evt.attendees.includes("RK")) evt.attendees.push("RK");
+  }
+
+  // Save to localStorage so it persists across page loads
+  saveProfileEvents();
+
+  showToast("✓ Checked in! People you met will appear here.");
+  setTimeout(()=>{
+    renderEvents();
+    renderProfileEvents(); // update profile immediately
+    setTimeout(()=>showToast("WhatsApp sent with alumni you met at "+eventTitle), 800);
+  }, 1500);
+}
+
+// Persist check-ins to localStorage
+function saveProfileEvents(){
+  try{
+    const data=EVENTS.filter(e=>e.youAttended).map((e,i)=>({
+      idx:EVENTS.indexOf(e),title:e.title,date:e.date,chapter:e.chapter,
+      attending:e.attending,color:e.color,attendees:e.attendees||[]
+    }));
+    localStorage.setItem("knet_events_attended", JSON.stringify(data));
+  }catch(err){}
+}
+
+function loadProfileEvents(){
+  try{
+    const saved=localStorage.getItem("knet_events_attended");
+    if(!saved)return;
+    const data=JSON.parse(saved);
+    data.forEach(d=>{
+      if(EVENTS[d.idx]){
+        EVENTS[d.idx].youAttended=true;
+        EVENTS[d.idx].attendees=d.attendees||[];
+        checkedInEvents.add(d.idx);
+      }
+    });
+  }catch(err){}
+}
+
+function renderProfileEvents(){
+  const el=document.getElementById("profile-events-list");
+  if(!el)return;
+
+  // Seed events: always show the pre-attended one + any new check-ins
+  const seedEvents=[
+    {title:"Dubai Chapter Dinner 2024",date:"Oct 12, 2024",chapter:"Dubai",attending:47,connected:5,color:["#F59E0B","#EF4444"],attendees:[]},
+    {title:"IIMK Startup Summit 2025",date:"Nov 5, 2025",chapter:"Bengaluru",attending:210,connected:14,color:["#5B3CF5","#E040FB"],attendees:["SB","RN","KI"]},
+  ];
+  const dynamicEvents=EVENTS.filter(e=>e.youAttended);
+  const allEvents=[...seedEvents,...dynamicEvents];
+
+  if(!allEvents.length){
+    el.innerHTML=`<div style="padding:16px;text-align:center;font-size:13px;color:var(--mute)">No events attended yet.<br>Check in at your next event!</div>`;
+    const badge=document.getElementById("ev-att-count");
+    if(badge)badge.textContent="0";
+    return;
+  }
+
+  const badge=document.getElementById("ev-att-count");
+  if(badge)badge.textContent=allEvents.length;
+
+  el.innerHTML=allEvents.map((e,i)=>{
+    const attendeeAlumni=(e.attendees||[]).map(id=>ALUMNI_DATA.find(a=>a.i===id)).filter(Boolean);
+    const connected=e.connected||attendeeAlumni.length;
+    const isLast=i===allEvents.length-1;
+    return`
+    <div style="border-bottom:${isLast?"none":"1px solid rgba(91,60,245,.07)"}">
+      <!-- Event row -->
+      <div style="display:flex;align-items:center;gap:12px;padding:12px 16px;cursor:pointer" onclick="toggleEventDetail('evd-${i}')">
+        <div style="width:3px;height:36px;border-radius:3px;background:linear-gradient(180deg,${e.color[0]},${e.color[1]});flex-shrink:0"></div>
+        <div style="flex:1;min-width:0">
+          <div style="font-size:13.5px;font-weight:700;color:var(--ink)">${e.title}</div>
+          <div style="font-size:11.5px;color:var(--mute);margin-top:2px">${e.date} · ${e.chapter||""} · ${e.attending} alumni</div>
+          ${connected?`<div style="font-size:11.5px;color:var(--pu);font-weight:600;margin-top:1px">${connected} connected after</div>`:""}
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px">
+          <span style="font-size:11px;font-weight:700;padding:2px 9px;border-radius:20px;background:#ECFDF5;color:#059669">✓ Attended</span>
+          <span style="font-size:11px;color:var(--dim)" id="arr-${i}">▾</span>
+        </div>
+      </div>
+      <!-- Expandable: people you met -->
+      <div id="evd-${i}" style="display:none;padding:0 16px 12px">
+        ${attendeeAlumni.length?`
+        <div style="font-size:11.5px;font-weight:700;color:var(--mute);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">People you met</div>
+        <div style="display:flex;flex-direction:column;gap:7px">
+          ${attendeeAlumni.map(a=>`
+          <div style="display:flex;align-items:center;gap:10px;background:var(--bg);border-radius:13px;padding:9px 12px">
+            <div class="av ${a.av}" style="width:32px;height:32px;font-size:10px;font-family:Syne,sans-serif">${a.i}</div>
+            <div style="flex:1;min-width:0">
+              <div style="font-size:13px;font-weight:700;color:var(--ink)">${a.n}</div>
+              <div style="font-size:11px;color:var(--mute);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${a.r} · ${a.c}</div>
+            </div>
+            <button class="btn bg bsm" style="padding:6px 11px;font-size:11px;flex-shrink:0" onclick="openCx('${a.n}','${a.r}','${a.av}','${a.i}','${a.li||""}')">Connect</button>
+          </div>`).join("")}
+        </div>`:`<div style="font-size:13px;color:var(--mute);padding:4px 0">Check-in recorded. People you met will appear here as others check in.</div>`}
+      </div>
+    </div>`;
+  }).join("");
+}
+
+function toggleEventDetail(id){
+  const el=document.getElementById(id);
+  if(!el)return;
+  const open=el.style.display==="block";
+  el.style.display=open?"none":"block";
+  // flip arrow
+  const idx=id.replace("evd-","");
+  const arr=document.getElementById("arr-"+idx);
+  if(arr)arr.textContent=open?"▾":"▴";
+}
+
+
+// ═══ COLLABORATIONS ═══
+const COLLABS_SEEKING=[
+  {co:"Sharkify Technology",founder:"Ravan Kulkarni",fi:"RK",fav:"aor",b:"'16",sector:"Tech / SaaS",filter:"tech",title:"WhatsApp automation SaaS — seeking distribution partners",desc:"Shyra.pro is a WhatsApp automation SaaS for Indian SMEs. Looking for channel partners, resellers, and co-marketing arrangements in Tier-2 cities. Revenue share model.",need:"Distribution · Channel partners · Co-marketing",tags:["SaaS","WhatsApp","B2B"],asks:5,views:34},
+  {co:"Finphi Technologies",founder:"Rahul Nair",fi:"RN",fav:"aor",b:"'16",sector:"FinTech",filter:"fintech",title:"B2B FinTech SaaS — seeking NBFC / bank integration partners",desc:"Finphi automates reconciliation for NBFCs. Seeking banking and NBFC partners to offer white-label integration. ₹30L ARR, growing 3x.",need:"NBFC partners · Bank integrations · API partnerships",tags:["FinTech","SaaS","Banking"],asks:8,views:61},
+  {co:"GreenMile EV",founder:"Sunita P",fi:"SP",fav:"ate",b:"'10",sector:"CleanTech",filter:"d2c",title:"EV charging network — seeking real estate and fleet partners",desc:"GreenMile has 450+ charging stations across 8 cities. Seeking commercial real estate owners, fleet operators and logistics companies to expand footprint.",need:"Real estate · Fleet operators · Logistics partners",tags:["EV","CleanTech","Infra"],asks:6,views:49},
+  {co:"Kaizer News Network",founder:"Ravan Kulkarni",fi:"RK",fav:"aor",b:"'16",sector:"Media",filter:"media",title:"Telugu news network — seeking content and brand partnerships",desc:"13-channel Telugu YouTube news network with 2.6M subscribers. Seeking brand deals, content co-productions, and regional business spotlights.",need:"Brand deals · Content · Sponsorships",tags:["Media","Telugu","YouTube"],asks:3,views:28},
+  {co:"DataWeave",founder:"Prasad K",fi:"PK",fav:"apu",b:"'13",sector:"Tech / SaaS",filter:"tech",title:"AI competitive intelligence — seeking e-commerce brand pilots",desc:"DataWeave offers real-time pricing and assortment analytics for e-commerce brands. Seeking 3–5 pilot partners for a co-development program. Free pilot, rev-share post.",need:"E-commerce brands · D2C pilots · Co-development",tags:["AI/ML","SaaS","E-commerce"],asks:4,views:42},
+];
+const COLLABS_OFFERING=[
+  {co:"Deloitte India",founder:"Priya Menon",fi:"PM",fav:"apu",b:"'19",sector:"Consulting",filter:"consulting",title:"Strategy consulting — offering pro-bono for IIMK startups",desc:"Deloitte's strategy team is offering 2 pro-bono consulting engagements for IIMK alumni-founded startups. Market entry, org design, fundraise readiness.",offering:"Pro-bono strategy consulting · 2 slots · 3 months",tags:["Consulting","Strategy","Startup"],slots:2,views:47},
+  {co:"Microsoft India",founder:"Aditya P",fi:"AP",fav:"apu",b:"'19",sector:"Tech / SaaS",filter:"tech",title:"Azure startup credits + technical co-building",desc:"Microsoft for Startups is offering ₹20L in Azure credits plus engineering support for IIMK-founded startups in AI/ML, SaaS, or HealthTech verticals.",offering:"₹20L Azure credits · Engineering support · Go-to-market",tags:["Cloud","AI/ML","SaaS"],slots:5,views:89},
+  {co:"Swiggy",founder:"Deepa V",fi:"DV",fav:"api",b:"'13",sector:"D2C",filter:"d2c",title:"D2C brand co-marketing on Swiggy Instamart",desc:"Swiggy's marketing team is offering co-marketing slots on Instamart for D2C food/FMCG brands run by IIMK alumni. Featured placement + shared campaigns.",offering:"Featured listing · Co-marketing budget · Joint PR",tags:["D2C","FMCG","Marketing"],slots:3,views:62},
+  {co:"Goldman Sachs",founder:"Karthik Iyer",fi:"KI",fav:"aam",b:"'10",sector:"FinTech",filter:"fintech",title:"Investment banking advisory for IIMK founders",desc:"Goldman Sachs India team offering advisory sessions for IIMK founders planning a fundraise above ₹10Cr. Covers valuation, term sheets, investor positioning.",offering:"IB advisory · Fundraise guidance · Intro to family offices",tags:["Finance","Fundraising","FinTech"],slots:4,views:73},
+];
+let collabMode="seek",cCF="all";
+
+function setCollabMode(mode){
+  collabMode=mode;
+  const seek=document.getElementById("ct-seek");
+  const offer=document.getElementById("ct-offer");
+  if(!seek||!offer)return;
+  const activeStyle="flex:1;text-align:center;padding:9px;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;background:var(--card);color:var(--ink);box-shadow:0 1px 4px rgba(0,0,0,.06)";
+  const inactiveStyle="flex:1;text-align:center;padding:9px;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;color:var(--mute)";
+  seek.style.cssText=mode==="seek"?activeStyle:inactiveStyle;
+  offer.style.cssText=mode==="offer"?activeStyle:inactiveStyle;
+  renderCollab();
+}
+function setCF(el,f){cCF=f;document.querySelectorAll("#cf-chips .chip").forEach(c=>c.classList.remove("on"));el.classList.add("on");renderCollab();}
+
+function renderCollab(){
+  const el=document.getElementById("collab-list");
+  if(!el)return;
+  if(collabMode==="seek"){
+    let data=COLLABS_SEEKING;
+    if(cCF!=="all")data=data.filter(d=>d.filter===cCF);
+    el.innerHTML="<div style='margin:0 18px 10px;font-size:13px;color:var(--mute)'>Businesses actively looking for collaborators.</div>"
+    +data.map(d=>`
+      <div class="cardf" style="margin:0 18px 10px">
+        <div style="padding:14px 14px 10px">
+          <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:6px">
+            <div style="font-family:Syne,sans-serif;font-size:14.5px;color:var(--ink);font-weight:700;line-height:1.3">${d.title}</div>
+            ${tc(d.sector)}
+          </div>
+          <div style="font-size:12.5px;color:var(--sub);line-height:1.65;margin-bottom:10px">${d.desc}</div>
+          <div style="background:var(--bg);border-radius:12px;padding:9px 12px;font-size:12px;color:var(--sub);margin-bottom:10px">
+            <span style="font-weight:700;color:var(--ink)">Looking for: </span>${d.need}
+          </div>
+          <div style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:12px">${d.tags.map(tc).join("")}</div>
+          <div style="display:flex;align-items:center;justify-content:space-between;padding-top:10px;border-top:1px solid rgba(91,60,245,.06);flex-wrap:wrap;gap:8px">
+            <div style="display:flex;align-items:center;gap:9px">
+              <div class="av ${d.fav}" style="width:28px;height:28px;font-size:9px;font-family:Syne,sans-serif">${d.fi}</div>
+              <div><div style="font-size:12.5px;font-weight:700;color:var(--ink)">${d.founder}</div><div style="font-size:11px;color:var(--mute)">${d.co} · Batch ${d.b}</div></div>
+            </div>
+            <div style="font-size:11.5px;color:var(--mute)">${d.asks} expressions · ${d.views} views</div>
+          </div>
+        </div>
+        <div style="padding:0 14px 14px;display:flex;gap:8px">
+          <button class="btn bo bsm" style="flex:1" onclick="showToast('Opening profile: ${d.founder}')">View details</button>
+          <button class="btn bg bsm" style="flex:1" onclick="openCx('${d.founder}','${d.co}','${d.fav}','${d.fi}','')">Express interest</button>
+        </div>
+      </div>`).join("") || "<div style='text-align:center;padding:40px;color:var(--mute)'>No collabs in this category</div>";
+  } else {
+    let data=COLLABS_OFFERING;
+    if(cCF!=="all")data=data.filter(d=>d.filter===cCF);
+    el.innerHTML="<div style='margin:0 18px 10px;font-size:13px;color:var(--mute)'>Alumni companies offering collaboration opportunities.</div>"
+    +data.map(d=>`
+      <div class="cardf" style="margin:0 18px 10px">
+        <div style="padding:14px 14px 10px">
+          <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:6px">
+            <div style="font-family:Syne,sans-serif;font-size:14.5px;color:var(--ink);font-weight:700;line-height:1.3">${d.title}</div>
+            ${tc(d.sector)}
+          </div>
+          <div style="font-size:12.5px;color:var(--sub);line-height:1.65;margin-bottom:10px">${d.desc}</div>
+          <div style="background:#ECFDF5;border-radius:12px;padding:9px 12px;font-size:12px;color:#065F46;margin-bottom:10px;border:1px solid #A7F3D0">
+            <span style="font-weight:700">Offering: </span>${d.offering}
+          </div>
+          <div style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:12px">${d.tags.map(tc).join("")}</div>
+          <div style="display:flex;align-items:center;justify-content:space-between;padding-top:10px;border-top:1px solid rgba(91,60,245,.06);flex-wrap:wrap;gap:8px">
+            <div style="display:flex;align-items:center;gap:9px">
+              <div class="av ${d.fav}" style="width:28px;height:28px;font-size:9px;font-family:Syne,sans-serif">${d.fi}</div>
+              <div><div style="font-size:12.5px;font-weight:700;color:var(--ink)">${d.founder}</div><div style="font-size:11px;color:var(--mute)">${d.co} · Batch ${d.b}</div></div>
+            </div>
+            <div style="font-size:11.5px;color:#059669;font-weight:700">${d.slots} slot${d.slots!==1?"s":""} available</div>
+          </div>
+        </div>
+        <div style="padding:0 14px 14px;display:flex;gap:8px">
+          <button class="btn bo bsm" style="flex:1" onclick="showToast('Opening details: ${d.co}')">View details</button>
+          <button class="btn bg bsm" style="flex:1" onclick="openCx('${d.founder}','${d.co}','${d.fav}','${d.fi}','')">Apply / Connect</button>
+        </div>
+      </div>`).join("") || "<div style='text-align:center;padding:40px;color:var(--mute)'>No offerings in this category</div>";
+  }
+}
+
+// TOAST
+function showToast(msg){const t=document.getElementById("tst");t.textContent=msg;t.classList.add("on");clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove("on"),2800);}
+
+// ADD CSS for notif items
+const s=document.createElement("style");s.textContent=`.notif-item{display:flex;align-items:flex-start;gap:12px;padding:14px 20px;border-bottom:1px solid rgba(91,60,245,.07);cursor:pointer;transition:background .1s}.notif-item.unread{background:rgba(255,92,53,.03)}.notif-ico{width:40px;height:40px;border-radius:13px;display:flex;align-items:center;justify-content:center;font-size:19px;flex-shrink:0}.notif-body{flex:1}.notif-txt{font-size:13.5px;color:var(--ink);line-height:1.5}.notif-time{font-size:11.5px;color:var(--mute);margin-top:3px}.notif-dot{width:8px;height:8px;border-radius:50%;background:var(--or);flex-shrink:0;margin-top:5px}.type-cell{padding:11px;border-radius:14px;border:1.5px solid var(--border);text-align:center;cursor:pointer;transition:all .15s}.type-cell.on{border-color:var(--pu);background:#EDEDFF}.form-inp{width:100%;padding:11px 13px;border-radius:13px;border:1.5px solid var(--border);background:var(--bg);font-size:14px;color:var(--ink);font-family:DM Sans,sans-serif;outline:none}.form-inp:focus{border-color:rgba(91,60,245,.4)}.form-inp::placeholder{color:var(--dim)}`;
+document.head.appendChild(s);
+
+// INIT
+loadProfileEvents();
+dbSeed().then(()=>{renderFeed();renderCompanies();renderLeaderboard();renderReunion();renderAl();renderGroups();renderMentors();renderFI();renderSyn();renderEvents();renderJobs();renderCL();renderKM();renderVenturesPreview();renderSuggested();renderProfileEvents();setTimeout(animProg,400);}).catch(console.error);
+// Greet
+const h=new Date().getHours();
+</script>
+</body>
+</html>
