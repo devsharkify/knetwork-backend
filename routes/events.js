@@ -148,12 +148,8 @@ async function notifyExistingAttendees(eventId, newAttendee, event) {
     .filter(a => a?.wa_notifications && a?.whatsapp_number);
 
   for (const alumnus of toNotify.slice(0, 50)) { // cap at 50 to avoid spam
-    await WA.sendWA?.({
-      mobile: alumnus.whatsapp_number,
-      templateId: process.env.WA_TPL_PEOPLE_YOU_MET,
-      variables: [alumnus.full_name, event.title, newAttendee.full_name],
-      alumniId: alumnus.id
-    });
+    await WA.peopleYouMet(alumnus, event, [newAttendee])
+      .catch(e => logger.error('WA notify existing attendee failed', e));
     await new Promise(ok => setTimeout(ok, 500));
   }
 }

@@ -37,7 +37,7 @@ async function explainMatch(alumniA, alumniB, score) {
       system: 'You write concise, warm 1-sentence explanations of why two IIMK alumni would benefit from connecting. Keep it under 20 words.',
       messages: [{
         role: 'user',
-        content: `Why should ${alumniA.full_name} (${alumniA.current_title}, goals: ${alumniA.goals?.join(', ')}) connect with ${alumniB.full_name} (${alumniB.current_title}, goals: ${alumniB.goals?.join(', ')})? Match score: ${score}%.`
+        content: `Why should ${alumniA.full_name} (${alumniA.current_title}, goals: ${(alumniA.alumni_goals || alumniA.goals || []).map(g => g.goal || g).join(', ')}) connect with ${alumniB.full_name} (${alumniB.current_title}, goals: ${(alumniB.alumni_goals || alumniB.goals || []).map(g => g.goal || g).join(', ')})? Match score: ${score}%.`
       }]
     });
     return res.content[0].text.trim();
@@ -56,7 +56,7 @@ async function scoreOpportunity(opp, alumniProfile) {
       messages: [{
         role: 'user',
         content: `Opportunity: "${opp.title}" (${opp.type}) at ${opp.company || 'N/A'}.
-Alumni: ${alumniProfile.current_title} at ${alumniProfile.current_company}, tags: ${alumniProfile.tags?.join(', ')}, goals: ${alumniProfile.goals?.join(', ')}.
+Alumni: ${alumniProfile.current_title} at ${alumniProfile.current_company}, tags: ${(alumniProfile.alumni_tags || []).map(t => t.interest_tags?.label || t).join(', ')}, goals: ${(alumniProfile.alumni_goals || []).map(g => g.goal || g).join(', ')}.
 Respond: {"score":0-100,"reason":"one sentence","notify":true/false}`
       }]
     });

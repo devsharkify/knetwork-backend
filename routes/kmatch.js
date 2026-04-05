@@ -2,7 +2,7 @@ const router = require('express').Router();
 const supabase = require('../config/supabase');
 const WA = require('../services/whatsapp');
 const { explainMatch } = require('../services/claude');
-const { requireAuth, requireVerified } = require('../middleware/auth');
+const { requireAuth, requireVerified, requireAdmin } = require('../middleware/auth');
 const logger = require('../config/logger');
 
 // GET /kmatch/feed — personalised match suggestions
@@ -125,7 +125,7 @@ router.post('/action', requireAuth, requireVerified, async (req, res) => {
 });
 
 // POST /kmatch/recompute — admin trigger to recompute all scores
-router.post('/recompute', requireAuth, async (req, res) => {
+router.post('/recompute', requireAuth, requireAdmin(['super_admin']), async (req, res) => {
   res.json({ ok: true, message: 'Score recomputation queued (runs via cron)' });
   // Actual recomputation happens in cron/kmatch.js
 });

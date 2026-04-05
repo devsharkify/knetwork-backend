@@ -53,18 +53,21 @@ app.use('/api/events',    require('./routes/events'));
 app.use('/api',           require('./routes/feed'));   // /api/feed, /api/opps, /api/syndicate, /api/groups, /api/leaderboard, /api/broadcast
 
 // ── Webhooks (no auth middleware — verified by signature) ──
-app.post('/webhooks/razorpay', express.raw({ type: 'application/json' }), async (req, res) => {
+app.post('/webhooks/razorpay', async (req, res) => {
   const crypto = require('crypto');
   const secret = process.env.RAZORPAY_WEBHOOK_SECRET;
   const signature = req.headers['x-razorpay-signature'];
-  const digest = crypto.createHmac('sha256', secret).update(req.body).digest('hex');
 
-  if (digest !== signature) {
+  // req.body is already parsed by express.json(); stringify for HMAC verification
+  const bodyStr = JSON.stringify(req.body);
+  const digest = crypto.createHmac('sha256', secret || '').update(bodyStr).digest('hex');
+
+  if (!secret || digest !== signature) {
     logger.warn('Invalid Razorpay webhook signature');
     return res.status(400).json({ error: 'Invalid signature' });
   }
 
-  const payload = JSON.parse(req.body);
+  const payload = req.body;
   const event = payload.event;
 
   if (event === 'payment.captured') {

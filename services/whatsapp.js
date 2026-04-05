@@ -157,4 +157,5 @@ const WA = {
   }
 };
 
+WA.sendWA = sendWA;
 module.exports = WA;

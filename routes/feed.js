@@ -3,12 +3,12 @@ const router = require('express').Router();
 const supabase = require('../config/supabase');
 const WA = require('../services/whatsapp');
 const { moderatePost, scoreOpportunity } = require('../services/claude');
-const { requireAuth, requireVerified } = require('../middleware/auth');
+const { requireAuth, requireVerified, requireAdmin } = require('../middleware/auth');
 const { validate, schemas } = require('../middleware/validate');
 const logger = require('../config/logger');
 
 // GET /feed
-router.get('/', requireAuth, async (req, res) => {
+router.get('/feed', requireAuth, async (req, res) => {
   const { type, page = 1, limit = 20 } = req.query;
   const offset = (page - 1) * limit;
 
@@ -39,7 +39,7 @@ router.get('/', requireAuth, async (req, res) => {
 });
 
 // POST /feed — create post with AI moderation
-router.post('/', requireAuth, requireVerified, validate(schemas.postFeed), async (req, res) => {
+router.post('/feed', requireAuth, requireVerified, validate(schemas.postFeed), async (req, res) => {
   const { body, post_type, tags, visibility } = req.body;
 
   // Claude moderation
@@ -76,7 +76,7 @@ router.post('/', requireAuth, requireVerified, validate(schemas.postFeed), async
 });
 
 // POST /feed/:id/like
-router.post('/:id/like', requireAuth, async (req, res) => {
+router.post('/feed/:id/like', requireAuth, async (req, res) => {
   const { data: existing } = await supabase
     .from('post_likes')
     .select('id')
@@ -86,21 +86,23 @@ router.post('/:id/like', requireAuth, async (req, res) => {
 
   if (existing) {
     await supabase.from('post_likes').delete().eq('post_id', req.params.id).eq('alumni_id', req.alumni.id);
-    await supabase.from('feed_posts').update({ likes: supabase.raw('likes - 1') }).eq('id', req.params.id);
+    await supabase.rpc('increment_field', { table_name: 'feed_posts', row_id: req.params.id, field_name: 'likes', amount: -1 }).catch(() => {});
     return res.json({ liked: false });
   }
 
   await supabase.from('post_likes').insert({ post_id: req.params.id, alumni_id: req.alumni.id });
-  await supabase.from('feed_posts').update({ likes: supabase.raw('likes + 1') }).eq('id', req.params.id);
+  await supabase.rpc('increment_field', { table_name: 'feed_posts', row_id: req.params.id, field_name: 'likes', amount: 1 }).catch(() => {});
   res.json({ liked: true });
 });
 
-// DELETE /feed/:id — remove own post or admin
-router.delete('/:id', requireAuth, async (req, res) => {
-  let query = supabase.from('feed_posts').delete().eq('id', req.params.id);
-  if (req.adminRole !== 'super_admin') query = query.eq('author_id', req.alumni.id);
+// DELETE /feed/:id — remove own post only (author must match)
+router.delete('/feed/:id', requireAuth, async (req, res) => {
+  const { error, count } = await supabase
+    .from('feed_posts')
+    .delete()
+    .eq('id', req.params.id)
+    .eq('author_id', req.alumni.id);
 
-  const { error } = await query;
   if (error) return res.status(500).json({ error: error.message });
   res.json({ ok: true });
 });
@@ -153,9 +155,7 @@ async function notifyMatchingAlumni(opp, poster) {
     }
 
     // Update notified count
-    await supabase.from('opportunities')
-      .update({ notified_count: supabase.raw('notified_count + 1') })
-      .eq('id', opp.id);
+    await supabase.rpc('increment_field', { table_name: 'opportunities', row_id: opp.id, field_name: 'notified_count', amount: 1 }).catch(() => {});
   }
 }
 
@@ -198,7 +198,7 @@ router.post('/opps/:id/interest', requireAuth, async (req, res) => {
   if (error) return res.status(500).json({ error: error.message });
 
   // Update interest count
-  await supabase.from('opportunities').update({ interest_count: supabase.raw('interest_count + 1') }).eq('id', req.params.id);
+  await supabase.rpc('increment_field', { table_name: 'opportunities', row_id: req.params.id, field_name: 'interest_count', amount: 1 }).catch(() => {});
 
   res.status(201).json({ interest: data });
 });
@@ -328,7 +328,7 @@ router.delete('/groups/:id/leave', requireAuth, async (req, res) => {
 });
 
 // WA Broadcast (admin)
-router.post('/broadcast', requireAuth, validate(schemas.broadcastWA), async (req, res) => {
+router.post('/broadcast', requireAuth, requireAdmin(['super_admin', 'chapter_admin']), validate(schemas.broadcastWA), async (req, res) => {
   const { group_id, template_name, custom_message } = req.body;
   res.json({ ok: true, message: 'Broadcast queued. Delivery typically takes 5–10 minutes.' });
   // Actual broadcast handled by cron/broadcast.js
