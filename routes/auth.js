@@ -1,6 +1,7 @@
 const router = require('express').Router();
 const supabase = require('../config/supabase');
 const WA = require('../services/whatsapp');
+const { sendSmsOtp } = require('../services/sms');
 const { scrapeProfile } = require('../services/proxycurl');
 const { validate, schemas } = require('../middleware/validate');
 const { requireAuth } = require('../middleware/auth');
@@ -18,13 +19,19 @@ router.post('/send-otp', async (req, res) => {
 
   const otp = Math.floor(100000 + Math.random() * 900000).toString();
   const key = `${country_code}${mobile}`;
-  otpStore.set(key, { otp, expires: Date.now() + 10 * 60 * 1000 });
+  otpStore.set(key, { otp, expires: Date.now() + 5 * 60 * 1000, attempts: 0 });
 
-  // Send via WhatsApp
-  await WA.otp(mobile, otp);
+  // Send OTP via SMS (Authkey.io)
+  const smsResult = await sendSmsOtp(mobile, otp, country_code.replace('+', ''));
 
-  logger.info('OTP sent', { mobile: mobile.slice(-4).padStart(mobile.length, '*') });
-  res.json({ ok: true, message: 'OTP sent via WhatsApp' });
+  if (!smsResult.ok) {
+    logger.warn('SMS OTP failed, falling back to WhatsApp', { mobile: mobile.slice(-4).padStart(mobile.length, '*') });
+    await WA.otp(mobile, otp);
+    return res.json({ ok: true, message: 'OTP sent via WhatsApp', channel: 'whatsapp' });
+  }
+
+  logger.info('OTP sent via SMS', { mobile: mobile.slice(-4).padStart(mobile.length, '*') });
+  res.json({ ok: true, message: 'OTP sent via SMS', channel: 'sms', expires_in: 300 });
 });
 
 // POST /auth/verify-otp
@@ -35,7 +42,12 @@ router.post('/verify-otp', async (req, res) => {
 
   if (!stored) return res.status(400).json({ error: 'OTP not found or expired. Request a new one.' });
   if (Date.now() > stored.expires) { otpStore.delete(key); return res.status(400).json({ error: 'OTP expired' }); }
-  if (stored.otp !== otp) return res.status(400).json({ error: 'Incorrect OTP' });
+  if (stored.attempts >= 3) { otpStore.delete(key); return res.status(400).json({ error: 'Too many attempts. Request a new OTP.' }); }
+  if (stored.otp !== otp) {
+    stored.attempts = (stored.attempts || 0) + 1;
+    const remaining = 3 - stored.attempts;
+    return res.status(400).json({ error: `Incorrect OTP. ${remaining} attempts remaining.` });
+  }
 
   otpStore.delete(key);
 
